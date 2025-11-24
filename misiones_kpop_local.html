@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Misiones K-POP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Archivo de estilos externo -->
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>Misiones de las Guerreras K-POP</h1>
+
+<!-- MISION LEGENDARIA COMO TARJETA FULL-WIDTH -->
+<div class="legend-card">
+  <h2>🎤 ¡Misión Legendaria!</h2>
+  <p>20 ejercicios de división → <strong>1 Álbum</strong></p>
+</div>
+
+
+  <h1>¡Cuadro de misiones!</h1>
+
+<!-- CUATRO MISIONES -->
+ 
+<div class="grid" >
+  
+  <div class="card">
+    <div class="icon">
+      <img src="img/pensar.png" alt="Icono matemáticas" loading="lazy">
+    </div>
+    <h2>Matemáticas</h2>
+    <p>5 ejercicios (base)</p>
+    <p>10 ejercicios (máxima)</p>
+  </div>
+
+  <div class="card">
+    <div class="icon">
+      <img src="img/productos.png" alt="Icono oficios" loading="lazy">
+    </div>
+    <h2>Oficios</h2>
+    <p>1 oficio (base)</p>
+    <p>3 oficios (máxima)</p>
+  </div>
+
+  <div class="card">
+    <div class="icon">
+      <img src="img/libro.png" alt="Icono lectura" loading="lazy">
+    </div>
+    <h2>Lectura</h2>
+    <p>2 hojas (base)</p>
+    <p>10 hojas (máxima)</p>
+  </div>
+
+  <div class="card">
+    <div class="icon">
+      <img src="img/ingles.png" alt="Icono inglés" loading="lazy">
+    </div>
+    <h2>Inglés</h2>
+    <p>2 horas (base) → 3 sobres</p>
+    <p>3 horas (máxima) → 4 sobres</p>
+  </div>
+
+</div>
+
+<!-- RECOMPENSAS -->
+<div class="rewards">
+  <h2>🎁 Recompensas</h2>
+
+  <div class="reward-line">
+    <img src="img/estrella.png" alt="Icono estrella" loading="lazy">
+    <span>Misión Base: <strong>3 sobres</strong></span>
+  </div>
+
+  <div class="reward-line">
+    <img src="img/corona.png" alt="Icono corona" loading="lazy">
+    <span>Misión Máxima: <strong>5 sobres</strong></span>
+  </div>
+
+  <div class="reward-line">
+    <img src="img/auriculares.png" alt="Icono auriculares" loading="lazy">
+    <span>Inglés: <strong>hasta 4 sobres</strong></span>
+  </div>
+
+  <div class="reward-line">
+    <img src="img/regalo.png" alt="Icono regalo" loading="lazy">
+    <span><strong>Total máximo diario: 9 sobres</strong></span>
+  </div>
+</div>
+
+
+<!-- ⭐⭐⭐⭐⭐ -->
+<!-- ⭐ TABLA SEMANAL INTERACTIVA ⭐ -->
+<!-- ⭐⭐⭐⭐⭐ -->
+
+<h2 class="weekly-title">📅 Tabla Semanal de Misiones</h2>
+
+<div class="weekly-controls">
+  <button id="resetBtn" class="reset-button">Reiniciar Semana</button>
+</div>
+
+<div class="weekly-table-container">
+  <table class="weekly-table">
+    <thead>
+      <tr>
+        <th>Día</th>
+        <th>Matemáticas<br>(0–10)</th>
+        <th>Oficios<br>(0–3)</th>
+        <th>Lectura<br>(0–10)</th>
+        <th>Inglés<br>(0–3)</th>
+        <th>Sobres</th>
+      </tr>
+    </thead>
+    <tbody id="weekBody">
+      <!-- JS generará aquí las filas -->
+    </tbody>
+  </table>
+</div>
+
+<div class="weekly-total">
+  Total semanal: <span id="weeklyTotal">0</span> sobres
+</div>
+
+
+<footer>
+  💖 ¡Sigue completando misiones, Guerrera K-POP! 💖
+</footer>
+
+</div> <!-- FIN container -->
+
+<!-- Archivo JS externo -->
+<script src="script.js"></script>
+
+</body>
+</html>
