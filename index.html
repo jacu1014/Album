@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🩰 Mi Diario Secreto de Ballet</title>
+    <title>🩰 Mi Diario de Ballet</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
@@ -21,141 +21,177 @@
         body {
             font-family: 'Quicksand', sans-serif;
             background: #1a2a2a; 
-            margin: 0; padding: 15px;
+            margin: 0; padding: 20px;
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh;
         }
 
+        /* Contenedor principal con el menú lateral (separadores) */
+        .main-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Menú tipo separadores (izquierda) */
+        .side-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-right: -5px; /* Para que parezca que salen de debajo del libro */
+            z-index: 1;
+        }
+
+        .tab-btn {
+            background: var(--rosa-principal);
+            border: none;
+            border-radius: 10px 0 0 10px;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: 0.3s;
+            box-shadow: -4px 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn.active {
+            background: var(--blanco-papel);
+            transform: translateX(5px);
+            box-shadow: -6px 6px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Estructura del Libro */
         .book-frame {
             background: var(--azul-borde);
-            padding: 15px; border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            width: 100%; max-width: 1100px;
+            padding: 15px; border-radius: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            flex: 1;
             position: relative;
+            z-index: 2;
         }
 
         .book-pages {
             background: var(--blanco-papel);
             display: flex; min-height: 650px;
-            position: relative; border-radius: 8px;
+            position: relative; border-radius: 5px;
             overflow: hidden;
-            background-image: linear-gradient(to right, #e5e5e5 0%, #ffffff 5%, #ffffff 45%, #d1d1d1 50%, #ffffff 55%, #ffffff 95%, #e5e5e5 100%);
+            /* El degradado crea la sombra del lomo en el centro exacto */
+            background-image: linear-gradient(to right, 
+                #e0e0e0 0%, #fff 5%, 
+                #fff 42%, #b1b1b1 50%, #fff 58%, 
+                #fff 95%, #e0e0e0 100%);
         }
 
-        .book-pages::before {
-            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
-            width: 3px; background: rgba(0,0,0,0.1); transform: translateX(-50%);
-            z-index: 10;
+        /* Contenedores de las páginas para evitar que choquen con el lomo */
+        .page-left, .page-right {
+            flex: 1;
+            padding: 40px 50px; /* Margen amplio para no tocar el centro */
+            display: flex;
+            flex-direction: column;
+            z-index: 5;
         }
 
-        /* LADO IZQUIERDO: Control y Estadísticas */
-        .page-left {
-            flex: 0.8; padding: 30px; border-right: 1px solid rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        /* LADO DERECHO: Cuadrícula de Ejercicios */
-        .page-right {
-            flex: 1.2; padding: 30px;
-            overflow-y: auto; max-height: 750px;
-        }
-
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--dorado); margin: 0; text-align: center; }
-
-        /* Panel de Estadísticas */
-        .stats-panel {
+        /* Estadísticas en la página izquierda */
+        .stats-book {
             background: var(--verde-menta);
-            width: 100%; border-radius: 15px;
-            padding: 15px; margin: 20px 0;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            text-align: center;
+            padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 25px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-        .stat-item { margin: 10px 0; font-weight: 700; color: var(--texto); }
-        .stat-val { color: var(--dorado); font-size: 1.4rem; display: block; }
 
-        /* Menú de Navegación Vertical */
-        .nav-menu {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-            width: 100%; margin-top: auto;
+        .stat-circle {
+            font-size: 2rem; font-weight: bold; color: var(--dorado);
+            display: block; margin-top: 5px;
         }
-        .nav-btn {
-            background: white; border: 2px solid var(--rosa-principal);
-            padding: 10px; border-radius: 12px; cursor: pointer;
-            font-size: 1.5rem; transition: 0.3s; display: flex;
-            justify-content: center; align-items: center;
-        }
-        .nav-btn.active { background: var(--rosa-principal); transform: scale(1.05); }
 
-        /* Cuadrícula de 2 Ejercicios por fila */
+        /* Cuadrícula de ejercicios (2 por página, título arriba, foto abajo) */
         .exercise-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            display: grid;
+            grid-template-columns: 1fr; /* Uno sobre otro en cada página */
+            gap: 30px;
         }
 
-        .exercise-slot {
-            background: #fdfdfd; border: 1px solid #eee;
-            padding: 10px; border-radius: 10px;
-            display: flex; flex-direction: column;
-            text-align: center; position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        .exercise-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 10px;
+            position: relative;
         }
 
-        .slot-title {
-            font-weight: 700; font-size: 0.9rem; margin-bottom: 8px;
-            color: var(--texto); height: 40px; display: flex;
-            align-items: center; justify-content: center;
+        .exercise-header {
+            margin-bottom: 10px;
         }
 
-        .slot-img {
-            width: 100%; aspect-ratio: 1/1; object-fit: cover;
-            border-radius: 8px; border: 3px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .exercise-header h3 {
+            margin: 0; font-size: 1.1rem; color: var(--texto);
+            font-family: 'Quicksand', sans-serif;
         }
 
-        .slot-check {
+        .exercise-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border: 4px solid white;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .desc-text {
+            font-size: 0.85rem; color: #666; margin: 8px 0;
+            line-height: 1.3;
+        }
+
+        .btn-check {
             position: absolute; bottom: 15px; right: 15px;
-            background: white; border: 2px solid var(--rosa-principal);
-            width: 35px; height: 35px; border-radius: 50%;
-            cursor: pointer; font-size: 16px; z-index: 5;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid var(--rosa-principal); background: white;
+            cursor: pointer; font-size: 18px; transition: 0.3s;
         }
-        .slot-check.done { background: var(--dorado); border-color: var(--dorado); color: white; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .btn-check.done {
+            background: var(--dorado); color: white; border-color: var(--dorado);
+        }
 
-        @media (max-width: 768px) {
+        h1 { font-family: 'Dancing Script', cursive; color: var(--dorado); text-align: center; margin-top: 0; }
+
+        @media (max-width: 900px) {
             .book-pages { flex-direction: column; }
-            .book-pages::before { display: none; }
-            .exercise-grid { grid-template-columns: 1fr; }
-            .page-left { flex: none; }
+            .main-container { flex-direction: column-reverse; }
+            .side-tabs { flex-direction: row; margin-right: 0; margin-top: -5px; }
+            .tab-btn { border-radius: 0 0 10px 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="book-frame">
-        <div class="book-pages">
-            <div class="page-left">
-                <h1>Mi Diario</h1>
-                
-                <div class="stats-panel">
-                    <div class="stat-item">Progreso <span class="stat-val" id="stat-pc">0%</span></div>
-                    <div class="stat-item">Estrellas <span class="stat-val" id="stat-stars">0 / 0</span></div>
-                </div>
+    <div class="main-container">
+        <div class="side-tabs">
+            <button class="tab-btn active" onclick="filterData('Todos', this)">🏠</button>
+            <button class="tab-btn" onclick="filterData('Pies', this)">🩰</button>
+            <button class="tab-btn" onclick="filterData('Brazos', this)">👐</button>
+            <button class="tab-btn" onclick="filterData('Movimiento', this)">✨</button>
+        </div>
 
-                <div id="daily-message" style="font-style: italic; font-size: 0.9rem; text-align: center; margin-bottom: 20px; color: #666;">
-                    "Cargando..."
-                </div>
-
-                <div class="nav-menu">
-                    <button class="nav-btn active" title="Inicio" onclick="filterData('Todos', this)">🏠</button>
-                    <button class="nav-btn" title="Pies" onclick="filterData('Pies', this)">🩰</button>
-                    <button class="nav-btn" title="Brazos" onclick="filterData('Brazos', this)">👐</button>
-                    <button class="nav-btn" title="Movimiento" onclick="filterData('Movimiento', this)">✨</button>
-                </div>
-            </div>
-
-            <div class="page-right">
-                <div class="exercise-grid" id="exercise-grid">
+        <div class="book-frame">
+            <div class="book-pages">
+                <div class="page-left">
+                    <h1>Mi Diario</h1>
+                    <div class="stats-book">
+                        Progreso Actual: <span class="stat-circle" id="stat-pc">0%</span>
+                        <small id="stat-count">0 / 0 estrellas</small>
                     </div>
+                    <div class="exercise-grid" id="grid-left">
+                        </div>
+                </div>
+
+                <div class="page-right">
+                    <div class="exercise-grid" id="grid-right">
+                        </div>
+                </div>
             </div>
         </div>
     </div>
@@ -165,70 +201,62 @@
     <script>
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Ejercicios`;
-        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuracion`;
-
+        
         let allExercises = [];
-        let completedIds = new Set();
+        let completedSet = new Set();
 
-        function cleanJSON(text) {
-            return JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
-        }
-
-        async function init() {
+        async function loadData() {
             try {
-                // Mensaje y Configuración
-                const resC = await fetch(URL_CONFIG);
-                const jsonC = cleanJSON(await resC.text());
-                document.getElementById('daily-message').innerText = `"${jsonC.table.rows[0]?.c[1]?.v || '¡A brillar!'}"`;
-
-                // Ejercicios
-                const resE = await fetch(URL_EJERCICIOS);
-                const jsonE = cleanJSON(await resE.text());
-                allExercises = jsonE.table.rows.map((r, index) => ({
-                    id: index,
+                const res = await fetch(URL_EJERCICIOS);
+                const text = await res.text();
+                const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+                
+                allExercises = json.table.rows.map((r, i) => ({
+                    id: i,
                     cat: r.c[1]?.v || '',
-                    titulo: r.c[2]?.v || 'Sin título',
+                    titulo: r.c[2]?.v || 'Ejercicio',
                     desc: r.c[3]?.v || '',
-                    img: r.c[4]?.v || 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=400'
+                    img: r.c[4]?.v || 'https://via.placeholder.com/400x300?text=Ballet'
                 }));
 
-                updateStats();
                 render('Todos');
-            } catch (e) {
-                console.error(e);
-            }
+                updateStats();
+            } catch (e) { console.error(e); }
         }
 
         function render(filter) {
-            const grid = document.getElementById('exercise-grid');
-            grid.innerHTML = '';
-            
+            const left = document.getElementById('grid-left');
+            const right = document.getElementById('grid-right');
+            left.innerHTML = '';
+            right.innerHTML = '';
+
             const filtered = filter === 'Todos' ? allExercises : allExercises.filter(e => e.cat.includes(filter));
 
-            filtered.forEach(ex => {
-                const isDone = completedIds.has(ex.id);
-                const slot = document.createElement('div');
-                slot.className = 'exercise-slot';
-                slot.innerHTML = `
-                    <div class="slot-title">${ex.titulo}</div>
-                    <img src="${ex.img}" class="slot-img" alt="Ballet">
-                    <button class="slot-check ${isDone ? 'done' : ''}" onclick="toggleTask(${ex.id}, this)">
-                        ${isDone ? '✔' : '⭐'}
-                    </button>
+            filtered.forEach((ex, index) => {
+                const html = `
+                    <div class="exercise-item">
+                        <div class="exercise-header"><h3>${ex.titulo}</h3></div>
+                        <img src="${ex.img}" class="exercise-img">
+                        <p class="desc-text">${ex.desc}</p>
+                        <button class="btn-check ${completedSet.has(ex.id) ? 'done' : ''}" onclick="toggleTask(${ex.id}, this)">
+                            ${completedSet.has(ex.id) ? '✔' : '⭐'}
+                        </button>
+                    </div>
                 `;
-                grid.appendChild(slot);
+                
+                // Distribuye: los primeros 2 a la izquierda, el resto a la derecha
+                if (index < 2) left.innerHTML += html;
+                else if (index < 4) right.innerHTML += html;
             });
         }
 
         function toggleTask(id, btn) {
-            if (completedIds.has(id)) {
-                completedIds.delete(id);
-                btn.classList.remove('done');
-                btn.innerText = '⭐';
+            if(completedSet.has(id)) {
+                completedSet.delete(id);
+                btn.classList.remove('done'); btn.innerText = '⭐';
             } else {
-                completedIds.add(id);
-                btn.classList.add('done');
-                btn.innerText = '✔';
+                completedSet.add(id);
+                btn.classList.add('done'); btn.innerText = '✔';
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 }, colors: ['#D4AF37', '#FADADD'] });
                 document.getElementById('pop-sound').play();
             }
@@ -237,20 +265,19 @@
 
         function updateStats() {
             const total = allExercises.length;
-            const done = completedIds.size;
+            const done = completedSet.size;
             const pc = total > 0 ? Math.round((done / total) * 100) : 0;
-            
             document.getElementById('stat-pc').innerText = pc + '%';
-            document.getElementById('stat-stars').innerText = `${done} / ${total}`;
+            document.getElementById('stat-count').innerText = `${done} / ${total} estrellas`;
         }
 
         function filterData(cat, btn) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             render(cat);
         }
 
-        init();
+        loadData();
     </script>
 </body>
 </html>
