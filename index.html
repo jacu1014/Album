@@ -173,15 +173,20 @@
     async function init() {
         try {
             // 1. Cargar Configuración
+            // 1. Cargar Configuración (Mensaje del día)
             const resConfig = await fetch(URL_CONFIG);
             const csvConfig = await resConfig.text();
-            const configLines = csvConfig.split(/\r?\n/); // Divide por líneas de forma segura
+            const configLines = csvConfig.split(/\r?\n/);
 
-            // Buscamos la fila que contiene la clave exacta
-            const filaMensaje = configLines.find(line => {
-                const limpia = line.replace(/"/g, '').trim(); // Quitamos comillas y espacios
-                return limpia.startsWith("MensajeDelDia");
-            });
+            // Buscamos la fila donde la primera columna sea exactamente MensajeDelDia
+            for (let line of configLines) {
+                const cols = splitCSV(line); // Usamos tu función para separar por comas
+                // cols[0] es la Clave, cols[1] es el Valor
+                if (cols[0] && cols[0].trim().replace(/"/g, '') === "MensajeDelDia") {
+                    fraseDia = cols[1] ? cols[1].trim() : "¡A bailar!";
+                    break; // Una vez encontrado, dejamos de buscar
+                }
+            }
 
             if (filaMensaje) {
                 // Usamos la función splitCSV que ya tienes para separar Clave y Valor
