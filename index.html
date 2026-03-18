@@ -13,109 +13,107 @@
             --rosa-fuerte: #F8BBD0;
             --verde-menta: #E0F2F1;
             --dorado: #D4AF37;
-            --texto: #2C1E1B;
-            --blanco-papel: #FDFDFD;
-            --azul-borde: #00BCD4; /* El azul cian de la imagen de referencia */
+            --texto: #4E342E;
+            --blanco-papel: #FFFFFF;
+            --azul-borde: #00BCD4; 
         }
 
         body {
             font-family: 'Quicksand', sans-serif;
-            background: #1a2a2a; /* Fondo oscuro para resaltar el libro */
-            margin: 0; padding: 20px;
+            background: #1a2a2a; 
+            margin: 0; padding: 10px;
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Contenedor del Libro Abierto */
+        /* Contenedor del Libro */
         .book-frame {
             background: var(--azul-borde);
-            padding: 15px; border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            width: 95%; max-width: 1000px;
+            padding: 12px; border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 100%; max-width: 950px;
             position: relative;
         }
 
         .book-pages {
             background: var(--blanco-papel);
             display: flex; min-height: 600px;
-            position: relative; border-radius: 4px;
+            position: relative; border-radius: 5px;
             overflow: hidden;
             background-image: linear-gradient(to right, #e0e0e0 0%, #ffffff 5%, #ffffff 45%, #d1d1d1 50%, #ffffff 55%, #ffffff 95%, #e0e0e0 100%);
         }
 
-        /* Sombra central (el lomo del libro) */
+        /* Lomo central */
         .book-pages::before {
             content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
             width: 2px; background: rgba(0,0,0,0.1); transform: translateX(-50%);
             z-index: 10;
         }
 
-        /* Página Izquierda (Mensaje y Filtros) */
+        /* Página Izquierda: Título y Configuración */
         .page-left {
-            flex: 1; padding: 40px; border-right: 1px solid rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center;
+            flex: 1; padding: 30px; border-right: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
         }
 
-        /* Página Derecha (Ejercicios) */
+        /* Página Derecha: Lista de Ejercicios */
         .page-right {
-            flex: 1; padding: 40px;
-            overflow-y: auto; max-height: 700px;
+            flex: 1; padding: 30px;
+            overflow-y: auto; max-height: 750px;
         }
 
-        /* Títulos estilo Libro de Arena */
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #d32f2f; margin-bottom: 5px; text-align: center; }
-        .subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--texto); margin-bottom: 20px; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.4rem; color: var(--dorado); margin: 0; }
+        .subtitle { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--texto); margin-top: 5px; }
 
-        .message-quote {
-            font-style: italic; text-align: center; border-top: 1px solid #ccc;
-            border-bottom: 1px solid #ccc; padding: 20px 0; margin: 20px 0;
-            line-height: 1.6; color: #444; width: 100%;
+        .message-box {
+            font-style: italic; border-top: 1px solid var(--rosa-principal);
+            border-bottom: 1px solid var(--rosa-principal);
+            padding: 20px 0; margin: 30px 0; line-height: 1.6;
+            color: var(--texto); width: 100%; font-size: 1.1rem;
         }
 
-        /* Estilo de los ejercicios dentro del libro */
+        /* Tarjetas dentro del libro */
         .exercise-item {
-            margin-bottom: 30px; border-bottom: 1px dashed #ddd; padding-bottom: 20px;
-            animation: fadeIn 0.8s ease;
+            margin-bottom: 30px; border-bottom: 1px dashed var(--rosa-principal);
+            padding-bottom: 20px; animation: fadeIn 0.8s ease;
         }
 
-        .exercise-img {
-            width: 100%; border-radius: 5px; margin-bottom: 15px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1); border: 5px solid white;
+        .preview-img {
+            width: 100%; border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 4px solid white;
+            display: block;
         }
 
-        .exercise-info h3 { font-family: 'Quicksand', sans-serif; margin: 0; color: #d32f2f; font-size: 1.1rem; }
-        .exercise-info p { font-size: 0.9rem; color: #555; line-height: 1.4; margin: 5px 0; }
+        .exercise-info h3 { margin: 0; color: var(--dorado); font-size: 1.2rem; }
+        .exercise-info p { font-size: 0.95rem; color: #666; margin: 8px 0; }
 
+        /* Botón de estrella */
         .btn-star {
-            background: none; border: 2px solid var(--rosa-principal);
-            border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px;
-            transition: 0.3s;
+            background: white; border: 2px solid var(--rosa-principal);
+            border-radius: 50%; width: 45px; height: 45px; cursor: pointer;
+            font-size: 20px; transition: 0.3s;
         }
-        .btn-star.done { background: var(--dorado); border-color: var(--dorado); color: white; }
+        .btn-star.done { background: var(--dorado); border-color: var(--dorado); color: white; transform: scale(1.1); }
 
-        /* Navegación dentro del libro */
-        .book-nav { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
-        .nav-icon { 
-            font-size: 1.5rem; cursor: pointer; transition: 0.3s; opacity: 0.5;
-        }
-        .nav-icon.active { opacity: 1; transform: scale(1.2); }
+        /* Navegación (Filtros) */
+        nav { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
+        .nav-item { font-size: 1.8rem; cursor: pointer; transition: 0.3s; filter: grayscale(1); }
+        .nav-item.active { filter: grayscale(0); transform: scale(1.3); }
 
-        /* Detalles de esquinas dobladas */
-        .corner {
-            position: absolute; bottom: 0; width: 50px; height: 50px;
-            background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%, #ddd 100%);
-            z-index: 20;
+        /* Barra de progreso sutil */
+        #progress-bar {
+            position: absolute; bottom: 0; left: 0; height: 4px;
+            background: var(--dorado); transition: width 0.5s ease;
         }
-        .corner-left { left: 0; transform: scaleX(-1); }
-        .corner-right { right: 0; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Adaptación móvil (una sola página) */
+        /* Responsive Móvil */
         @media (max-width: 768px) {
             .book-pages { flex-direction: column; }
             .book-pages::before { display: none; }
             .page-right { max-height: none; }
+            .page-left { padding: 20px; min-height: auto; }
         }
     </style>
 </head>
@@ -123,28 +121,27 @@
 
     <div class="book-frame">
         <div class="book-pages">
+            <div id="progress-bar" style="width: 0%"></div>
+
             <div class="page-left">
                 <h1>Mi Diario de Ballet</h1>
-                <div class="subtitle">Jorge Luis Ceballos (Papá)</div>
+                <div class="subtitle">Mi turno de brillar</div>
                 
-                <div class="message-quote" id="daily-message">
-                    ... cargando inspiración mágica ...
+                <div class="message-box" id="daily-message">
+                    "Abriendo el libro mágico..."
                 </div>
 
-                <div class="book-nav">
-                    <span class="nav-icon active" onclick="filterData('Todos', this)">🏠</span>
-                    <span class="nav-icon" onclick="filterData('Pies', this)">🩰</span>
-                    <span class="nav-icon" onclick="filterData('Brazos', this)">👐</span>
-                    <span class="nav-icon" onclick="filterData('Movimiento', this)">✨</span>
-                </div>
+                <nav>
+                    <div class="nav-item active" onclick="filterData('Todos', this)">🏠</div>
+                    <div class="nav-item" onclick="filterData('Pies', this)">🩰</div>
+                    <div class="nav-item" onclick="filterData('Brazos', this)">👐</div>
+                    <div class="nav-item" onclick="filterData('Movimiento', this)">✨</div>
+                </nav>
             </div>
 
             <div class="page-right" id="exercise-list">
-                <p style="text-align:center">Abriendo el libro...</p>
+                <p style="text-align:center; margin-top: 50px;">Buscando tus ejercicios...</p>
             </div>
-
-            <div class="corner corner-left"></div>
-            <div class="corner corner-right"></div>
         </div>
     </div>
 
@@ -153,38 +150,39 @@
     <script>
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Ejercicios`;
-        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuración`;
+        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuracion`;
 
         let allExercises = [];
+        let doneCount = 0;
 
-        function parseGoogleResponse(text) {
-            const base64 = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-            return JSON.parse(base64);
+        // Función robusta para limpiar el JSON de Google
+        function cleanGoogleJSON(text) {
+            return JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
         }
 
         async function loadData() {
             try {
-                // 1. Mensaje de Configuración
+                // 1. Cargar Configuración
                 const resConfig = await fetch(URL_CONFIG);
-                const jsonConfig = parseGoogleResponse(await resConfig.text());
-                // El mensaje está en la fila 0, columna 1
+                const jsonConfig = cleanGoogleJSON(await resConfig.text());
                 const mensaje = jsonConfig.table.rows[0]?.c[1]?.v || "¡Hoy vas a brillar!";
                 document.getElementById('daily-message').innerText = `"${mensaje}"`;
 
-                // 2. Ejercicios
+                // 2. Cargar Ejercicios
                 const resEx = await fetch(URL_EJERCICIOS);
-                const jsonEx = parseGoogleResponse(await resEx.text());
+                const jsonEx = cleanGoogleJSON(await resEx.text());
                 
                 allExercises = jsonEx.table.rows.map(r => ({
                     cat: r.c[1]?.v || 'Varios',
-                    titulo: r.c[2]?.v || 'Sin título',
+                    titulo: r.c[2]?.v || 'Ejercicio',
                     desc: r.c[3]?.v || '',
-                    img: r.c[4]?.v || '',
+                    img: r.c[4]?.v || '' // Columna E para la imagen
                 }));
 
                 render(allExercises);
             } catch (e) {
-                document.getElementById('exercise-list').innerHTML = "<p>Error al abrir el libro.</p>";
+                console.error(e);
+                document.getElementById('exercise-list').innerHTML = "<p style='text-align:center; color:red;'>⚠️ Error al conectar con el libro. Verifica la publicación.</p>";
             }
         }
 
@@ -196,11 +194,11 @@
                 const item = document.createElement('div');
                 item.className = 'exercise-item';
                 
-                // Si hay link de imagen en el Excel (columna E), se usa. Si no, una genérica.
-                const imgSource = ex.img ? ex.img : 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=400&q=80';
+                // Imagen por defecto si la celda está vacía
+                const imgUrl = ex.img || 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=400&q=80';
 
                 item.innerHTML = `
-                    <img src="${imgSource}" class="exercise-img">
+                    <img src="${imgUrl}" class="preview-img" onerror="this.src='https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=400&q=80'">
                     <div class="exercise-info">
                         <h3>${ex.titulo}</h3>
                         <p>${ex.desc}</p>
@@ -212,27 +210,29 @@
         }
 
         function filterData(cat, el) {
-            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             if(cat === 'Todos') render(allExercises);
-            else render(allExercises.filter(e => e.cat.toLowerCase().includes(cat.toLowerCase())));
+            else render(allExercises.filter(e => e.cat.includes(cat)));
         }
 
         function completeTask(btn) {
             if(!btn.classList.contains('done')) {
                 btn.classList.add('done');
                 btn.innerText = '✔';
+                doneCount++;
                 confetti({ 
-                    particleCount: 150, 
-                    spread: 70, 
-                    origin: { y: 0.7 }, 
-                    colors: ['#FADADD', '#D4AF37', '#00BCD4'] 
+                    particleCount: 100, spread: 70, origin: { y: 0.8 }, 
+                    colors: ['#FADADD', '#D4AF37', '#E0F2F1'] 
                 });
                 try { document.getElementById('pop-sound').play(); } catch(e){}
             } else {
                 btn.classList.remove('done');
                 btn.innerText = '⭐';
+                doneCount--;
             }
+            const progress = (doneCount / allExercises.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
         }
 
         loadData();
