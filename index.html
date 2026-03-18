@@ -65,15 +65,15 @@
             overflow: hidden;
         }
 
-        .index-container {
+        .content-area {
             flex: 1;
             overflow-y: auto;
             margin-bottom: 50px;
             padding-right: 10px;
         }
 
-        .index-container::-webkit-scrollbar { width: 5px; }
-        .index-container::-webkit-scrollbar-thumb { background: var(--rosa-principal); border-radius: 10px; }
+        .content-area::-webkit-scrollbar { width: 5px; }
+        .content-area::-webkit-scrollbar-thumb { background: var(--rosa-principal); border-radius: 10px; }
 
         .index-item {
             padding: 10px 0; border-bottom: 1px dashed #eee;
@@ -102,9 +102,23 @@
             background: #f9f9f9;
         }
 
-        .progress-box {
-            background: var(--verde-menta); padding: 15px; border-radius: 15px;
-            text-align: center; margin-bottom: 15px;
+        .welcome-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .btn-reset {
+            background: var(--rosa-principal);
+            border: 2px solid var(--dorado);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Quicksand';
+            font-weight: bold;
+            margin-top: 20px;
         }
 
         @media (max-width: 800px) {
@@ -118,45 +132,42 @@
 
     <div class="main-wrapper">
         <div class="side-tabs">
-            <button class="tab-btn active" onclick="changeCategory('Todos', this)">🏠</button>
+            <button class="tab-btn active" onclick="goHome(this)">🏠</button>
             <button class="tab-btn" onclick="changeCategory('Pies', this)">🩰</button>
             <button class="tab-btn" onclick="changeCategory('Brazos', this)">👐</button>
             <button class="tab-btn" onclick="changeCategory('Movimiento', this)">✨</button>
         </div>
 
         <div class="book-container">
-            <div class="book-content">
-                <div class="page">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Diario de Ejercicios</h2>
-                    <div class="progress-box">
-                        <strong id="ui-percent">0%</strong> completado | <span id="ui-stars">0/0</span> ⭐
-                    </div>
-                    <div class="index-container" id="ui-index">
-                        </div>
-                    <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
+            <div class="book-content" id="book-inner">
                 </div>
-
-                <div class="page" id="page-render">
-                    </div>
-                <button class="arrow arrow-next" onclick="nextPage()">➡</button>
-            </div>
         </div>
     </div>
 
     <script>
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
+        // URL para Ejercicios (gid=0) y Configuración (gid=1864195759 - Ajusta si el ID es distinto)
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1864195759`;
         
         let allExercises = [];
         let filteredExercises = [];
-        let currentIndex = 0;
+        let currentIndex = -1; // -1 significa que estamos en la pantalla de inicio
+        let fraseDia = "¡Es un gran día para bailar!";
         let completedSet = new Set();
 
         async function init() {
             try {
-                const res = await fetch(URL_EJERCICIOS);
-                const csvData = await res.text();
-                const rows = csvData.split('\n').slice(1); 
+                // Cargar Configuración
+                const resConfig = await fetch(URL_CONFIG);
+                const csvConfig = await resConfig.text();
+                const configRows = csvConfig.split('\n');
+                if(configRows[1]) fraseDia = configRows[1].split(',')[1]?.replace(/"/g, '') || fraseDia;
+
+                // Cargar Ejercicios
+                const resEx = await fetch(URL_EJERCICIOS);
+                const csvEx = await resEx.text();
+                const rows = csvEx.split('\n').slice(1); 
                 
                 allExercises = rows.filter(row => row.trim() !== "").map((row, i) => {
                     const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
@@ -165,57 +176,94 @@
                         cat: cols[1] || 'Varios',
                         titulo: cols[2] || 'Ejercicio',
                         desc: cols[3] || '',
-                        img: cols[4] || '' // Nombre del archivo del Sheet
+                        img: cols[4] || ''
                     };
                 });
 
                 filteredExercises = [...allExercises];
-                updateUI();
-                renderPage();
+                renderBook();
             } catch (e) {
                 console.error("Error:", e);
-                document.getElementById('ui-index').innerHTML = "<p style='color:red'>⚠️ Error de conexión.</p>";
+                document.getElementById('book-inner').innerHTML = "<p style='padding:20px; color:red'>⚠️ Error de conexión con el diario.</p>";
             }
         }
 
-        function renderPage() {
-            const container = document.getElementById('page-render');
-            const ex = filteredExercises[currentIndex];
-            if (!ex) return;
-
-            const isDone = completedSet.has(ex.id);
+        function renderBook() {
+            const container = document.getElementById('book-inner');
             
-            // LA LÓGICA CLAVE: Se añade el prefijo 'img/' automáticamente
-            const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+            if (currentIndex === -1) {
+                // MODO INICIO: Frase Izquierda | Índice Derecha
+                container.innerHTML = `
+                    <div class="page">
+                        <div class="welcome-screen">
+                            <h1 style="font-family:'Dancing Script'; color:var(--dorado)">Mi Diario</h1>
+                            <p style="font-style:italic; font-size:1.2rem;">"${fraseDia}"</p>
+                            <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar estrellas</button>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice</h2>
+                        <div class="content-area">${generateIndexHTML()}</div>
+                    </div>
+                `;
+            } else {
+                // MODO NAVEGACIÓN: Índice Izquierda | Ejercicio Derecha
+                const ex = filteredExercises[currentIndex];
+                const isDone = completedSet.has(ex.id);
+                const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
 
-            container.innerHTML = `
-                <div class="exercise-focus">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">${ex.titulo}</h2>
-                    <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error+al+cargar'">
-                    <p style="margin:15px 0; font-style:italic; font-size: 0.9rem; color:#555;">${ex.desc}</p>
-                    <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer; transition: 0.3s;">
-                        ${isDone ? '✅' : '⭐'}
-                    </button>
-                </div>
-            `;
+                container.innerHTML = `
+                    <div class="page">
+                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice</h2>
+                        <div class="content-area">${generateIndexHTML()}</div>
+                        <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
+                    </div>
+                    <div class="page">
+                        <div class="exercise-focus">
+                            <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">${ex.titulo}</h2>
+                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error+al+cargar'">
+                            <p style="margin:15px 0; font-style:italic; font-size: 0.9rem; color:#555;">${ex.desc}</p>
+                            <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer;">
+                                ${isDone ? '✅' : '⭐'}
+                            </button>
+                        </div>
+                        <button class="arrow arrow-next" onclick="nextPage()">➡</button>
+                    </div>
+                `;
+            }
         }
 
-        function updateUI() {
-            const indexList = document.getElementById('ui-index');
-            indexList.innerHTML = '';
-            filteredExercises.forEach((ex, i) => {
-                const item = document.createElement('div');
-                item.className = 'index-item';
-                item.style.fontWeight = (currentIndex === i) ? 'bold' : 'normal';
-                item.innerHTML = `<span>${i+1}. ${ex.titulo}</span> <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>`;
-                item.onclick = () => { currentIndex = i; renderPage(); updateUI(); };
-                indexList.appendChild(item);
-            });
+        function generateIndexHTML() {
+            return filteredExercises.map((ex, i) => `
+                <div class="index-item" style="font-weight: ${currentIndex === i ? 'bold' : 'normal'}" onclick="selectExercise(${i})">
+                    <span>${i+1}. ${ex.titulo}</span>
+                    <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>
+                </div>
+            `).join('');
+        }
 
-            const total = allExercises.length;
-            const done = completedSet.size;
-            document.getElementById('ui-percent').innerText = total > 0 ? Math.round((done/total)*100) + '%' : '0%';
-            document.getElementById('ui-stars').innerText = `${done}/${total}`;
+        function selectExercise(i) {
+            currentIndex = i;
+            renderBook();
+        }
+
+        function goHome(btn) {
+            updateActiveTab(btn);
+            currentIndex = -1;
+            filteredExercises = [...allExercises];
+            renderBook();
+        }
+
+        function changeCategory(cat, btn) {
+            updateActiveTab(btn);
+            filteredExercises = allExercises.filter(e => e.cat.includes(cat));
+            currentIndex = filteredExercises.length > 0 ? 0 : -1;
+            renderBook();
+        }
+
+        function updateActiveTab(btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
 
         function toggleStar(id) {
@@ -224,21 +272,18 @@
                 completedSet.add(id);
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
             }
-            updateUI();
-            renderPage();
+            renderBook();
         }
 
-        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderPage(); updateUI(); } }
-        function prevPage() { if (currentIndex > 0) { currentIndex--; renderPage(); updateUI(); } }
-
-        function changeCategory(cat, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filteredExercises = cat === 'Todos' ? [...allExercises] : allExercises.filter(e => e.cat.includes(cat));
-            currentIndex = 0;
-            updateUI();
-            renderPage();
+        function resetProgress() {
+            if(confirm("¿Quieres borrar todas tus estrellas de hoy?")) {
+                completedSet.clear();
+                renderBook();
+            }
         }
+
+        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderBook(); } }
+        function prevPage() { if (currentIndex > 0) { currentIndex--; renderBook(); } }
 
         init();
     </script>
