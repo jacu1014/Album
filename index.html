@@ -14,6 +14,7 @@
             --texto: #4E342E;
             --blanco-papel: #FFFFFF;
             --azul-borde: #00BCD4; 
+            --verde-menta: #f0fafa;
         }
 
         body {
@@ -61,17 +62,16 @@
             flex: 1; padding: 30px 40px;
             display: flex; flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
 
-        /* AJUSTE DEL ÍNDICE PARA QUE NO CHOQUE CON FLECHAS */
         .index-container {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 50px; /* Espacio para las flechas */
+            margin-bottom: 50px;
             padding-right: 10px;
         }
 
-        /* Estilo del Scrollbar del índice */
         .index-container::-webkit-scrollbar { width: 5px; }
         .index-container::-webkit-scrollbar-thumb { background: var(--rosa-principal); border-radius: 10px; }
 
@@ -81,7 +81,6 @@
             font-size: 0.95rem;
         }
 
-        /* POSICIONAMIENTO DE FLECHAS TIPO LIBRO REAL */
         .arrow {
             position: absolute; bottom: 20px;
             background: #4a90e2; color: white; border: none;
@@ -95,20 +94,23 @@
         .arrow-next { right: 20px; }
 
         .exercise-focus { text-align: center; }
+        
         .img-large {
-            width: 100%; max-height: 250px; object-fit: contain;
+            width: 100%; max-height: 280px; object-fit: contain;
             border: 5px solid white; border-radius: 5px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #f9f9f9;
         }
 
         .progress-box {
-            background: #f0fafa; padding: 15px; border-radius: 15px;
+            background: var(--verde-menta); padding: 15px; border-radius: 15px;
             text-align: center; margin-bottom: 15px;
         }
 
         @media (max-width: 800px) {
-            .book-content { flex-direction: column; }
-            .page { height: 50%; }
+            .book-content { flex-direction: column; height: auto; }
+            .page { min-height: 400px; }
+            .side-tabs { display: none; }
         }
     </style>
 </head>
@@ -125,7 +127,7 @@
         <div class="book-container">
             <div class="book-content">
                 <div class="page">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado)">Índice de Ejercicios</h2>
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Ejercicios</h2>
                     <div class="progress-box">
                         <strong id="ui-percent">0%</strong> completado | <span id="ui-stars">0/0</span> ⭐
                     </div>
@@ -142,7 +144,6 @@
     </div>
 
     <script>
-        // URL corregida para evitar errores de CORS y conexión
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
         
@@ -155,16 +156,17 @@
             try {
                 const res = await fetch(URL_EJERCICIOS);
                 const csvData = await res.text();
-                const rows = csvData.split('\n').slice(1); // Saltar encabezado
+                // Separar filas y limpiar espacios/comillas
+                const rows = csvData.split('\n').slice(1); 
                 
-                allExercises = rows.map((row, i) => {
-                    const cols = row.split(','); // Nota: Esto es básico, si hay comas en el texto usa un parser CSV
+                allExercises = rows.filter(row => row.trim() !== "").map((row, i) => {
+                    const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
                     return {
                         id: i,
                         cat: cols[1] || 'Varios',
                         titulo: cols[2] || 'Ejercicio',
                         desc: cols[3] || '',
-                        img: cols[4] || ''
+                        img: cols[4] || '' // Aquí llega el nombre del archivo del Sheet
                     };
                 });
 
@@ -172,8 +174,8 @@
                 updateUI();
                 renderPage();
             } catch (e) {
-                console.error("Error cargando datos:", e);
-                document.getElementById('ui-index').innerHTML = "<p style='color:red'>⚠️ Error al conectar con Google Sheets. Verifica que esté publicado.</p>";
+                console.error("Error:", e);
+                document.getElementById('ui-index').innerHTML = "<p style='color:red'>⚠️ Error de conexión.</p>";
             }
         }
 
@@ -183,12 +185,16 @@
             if (!ex) return;
 
             const isDone = completedSet.has(ex.id);
+            
+            // OPCIÓN A: Se añade el prefijo 'img/' automáticamente al nombre del archivo
+            const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+
             container.innerHTML = `
                 <div class="exercise-focus">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado)">${ex.titulo}</h2>
-                    <img src="${ex.img.trim()}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Ballet'">
-                    <p style="margin:15px 0; font-style:italic">${ex.desc}</p>
-                    <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3rem; cursor:pointer">
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">${ex.titulo}</h2>
+                    <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error+al+cargar'">
+                    <p style="margin:15px 0; font-style:italic; font-size: 0.9rem; color:#555;">${ex.desc}</p>
+                    <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer; transition: 0.3s;">
                         ${isDone ? '✅' : '⭐'}
                     </button>
                 </div>
@@ -201,8 +207,9 @@
             filteredExercises.forEach((ex, i) => {
                 const item = document.createElement('div');
                 item.className = 'index-item';
+                item.style.fontWeight = (currentIndex === i) ? 'bold' : 'normal';
                 item.innerHTML = `<span>${i+1}. ${ex.titulo}</span> <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>`;
-                item.onclick = () => { currentIndex = i; renderPage(); };
+                item.onclick = () => { currentIndex = i; renderPage(); updateUI(); };
                 indexList.appendChild(item);
             });
 
@@ -216,14 +223,14 @@
             if(completedSet.has(id)) completedSet.delete(id);
             else {
                 completedSet.add(id);
-                confetti({ particleCount: 100, origin: { y: 0.7 } });
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
             }
             updateUI();
             renderPage();
         }
 
-        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderPage(); } }
-        function prevPage() { if (currentIndex > 0) { currentIndex--; renderPage(); } }
+        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderPage(); updateUI(); } }
+        function prevPage() { if (currentIndex > 0) { currentIndex--; renderPage(); updateUI(); } }
 
         function changeCategory(cat, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
