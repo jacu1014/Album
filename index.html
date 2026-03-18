@@ -147,170 +147,167 @@
     </div>
 
     <script>
-        const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
-        const GID_EJERCICIOS = '0';
-        const GID_CONFIG = '1864195759'; 
+    const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
+    const GID_EJERCICIOS = '0';
+    const GID_CONFIG = '1864195759'; 
 
-        // URLs de exportación directa a CSV para evitar bloqueos de CORS
-        const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_EJERCICIOS}`;
-        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_CONFIG}`;
-        
-        let allExercises = [];
-        let filteredExercises = [];
-        let currentIndex = -1; 
-        let fraseDia = "¡Inspiración en camino...";
-        let completedSet = new Set();
+    const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_EJERCICIOS}`;
+    const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_CONFIG}`;
+    
+    let allExercises = [];
+    let filteredExercises = [];
+    let currentIndex = -1; 
+    let fraseDia = "¡Inspiración en camino...";
+    let completedSet = new Set();
 
-        if(localStorage.getItem('balletProgress')) {
-            completedSet = new Set(JSON.parse(localStorage.getItem('balletProgress')));
-        }
+    if(localStorage.getItem('balletProgress')) {
+        completedSet = new Set(JSON.parse(localStorage.getItem('balletProgress')));
+    }
 
-        async function init() {
-            try {
-                // 1. Cargar Mensaje del Día
-                const resConfig = await fetch(URL_CONFIG);
-                const csvConfig = await resConfig.text();
-                const configLines = csvConfig.split('\n');
-                const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
-                if (filaMensaje) {
-                    // Extraer texto después de la primera coma
-                    fraseDia = filaMensaje.split(',')[1]?.replace(/"/g, '').trim() || "¡A bailar!";
-                }
+    // Función mágica para separar por comas ignorando las que están entre comillas
+    function splitCSV(row) {
+        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+        return row.split(regex).map(c => c.replace(/^"|"$/g, '').trim());
+    }
 
-                // 2. Cargar Ejercicios
-                const resEx = await fetch(URL_EJERCICIOS);
-                const csvEx = await resEx.text();
-                const rows = csvEx.split('\n').slice(1); 
-                
-                allExercises = rows.filter(row => row.trim() !== "").map((row, i) => {
-                    const cols = row.split(',').map(c => c.replace(/^"|"$/g, '').trim());
-                    return {
-                        id: i,
-                        cat: cols[1] || 'Varios',
-                        titulo: cols[2] || 'Ejercicio',
-                        desc: cols[3] || '',
-                        img: cols[5] || '' 
-                    };
-                });
-
-                filteredExercises = [...allExercises];
-                renderBook();
-            } catch (e) {
-                console.error("Error cargando datos:", e);
-                document.getElementById('book-inner').innerHTML = `
-                    <div class="page" style="text-align:center; justify-content:center;">
-                        <h2 style="color:var(--dorado)">⚠️ No se pudo conectar con el libro.</h2>
-                        <p>Verifica que el archivo de Google Sheets esté <b>publicado en la web</b> como CSV.</p>
-                    </div>`;
+    async function init() {
+        try {
+            // 1. Cargar Configuración
+            const resConfig = await fetch(URL_CONFIG);
+            const csvConfig = await resConfig.text();
+            const configLines = csvConfig.split('\n');
+            const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
+            if (filaMensaje) {
+                const configCols = splitCSV(filaMensaje);
+                fraseDia = configCols[1] || "¡A bailar!";
             }
-        }
 
-        function renderBook() {
-            const container = document.getElementById('book-inner');
-            const total = allExercises.length;
-            const done = completedSet.size;
-            const porcentaje = total > 0 ? Math.round((done/total)*100) : 0;
+            // 2. Cargar Ejercicios
+            const resEx = await fetch(URL_EJERCICIOS);
+            const csvEx = await resEx.text();
+            const rows = csvEx.split(/\r?\n/).slice(1); 
+            
+            allExercises = rows.filter(row => row.trim() !== "").map((row, i) => {
+                const cols = splitCSV(row);
+                return {
+                    id: i,
+                    cat: cols[1] || 'Varios',
+                    titulo: cols[2] || 'Ejercicio',
+                    desc: cols[3] || '',
+                    // Columna 5 es "Imagen (Referencia)" según tu tabla
+                    img: cols[5] || '' 
+                };
+            });
 
-            if (currentIndex === -1) {
-                container.innerHTML = `
-                    <div class="page">
-                        <div class="welcome-screen">
-                            <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 3rem;">Mi Diario</h1>
-                            <div style="background: var(--verde-menta); padding: 20px; border-radius: 15px; border: 2px dashed var(--rosa-principal);">
-                                <p style="font-style:italic; font-size:1.3rem; color: var(--texto); margin:0;">"${fraseDia}"</p>
-                            </div>
-                            <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar estrellas</button>
-                        </div>
-                    </div>
-                    <div class="page">
-                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Clases</h2>
-                        <p>Progreso: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
-                        <div class="content-area">${generateIndexHTML()}</div>
-                    </div>
-                `;
-            } else {
-                const ex = filteredExercises[currentIndex];
-                const isDone = completedSet.has(ex.id);
-                // Si en el excel dice "postura.png", buscará en la carpeta "img/postura.png"
-                const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
-
-                container.innerHTML = `
-                    <div class="page">
-                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice</h2>
-                        <div class="content-area">${generateIndexHTML()}</div>
-                        <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
-                    </div>
-                    <div class="page">
-                        <div class="exercise-focus">
-                            <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 2.2rem;">${ex.titulo}</h2>
-                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error:+${ex.img}'">
-                            <p style="margin:15px 0; font-style:italic; color:#555;">${ex.desc}</p>
-                            <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:4rem; cursor:pointer;">
-                                ${isDone ? '✅' : '⭐'}
-                            </button>
-                        </div>
-                        <button class="arrow arrow-next" onclick="nextPage()">➡</button>
-                    </div>
-                `;
-            }
-        }
-
-        function generateIndexHTML() {
-            return filteredExercises.map((ex, i) => `
-                <div class="index-item" style="font-weight: ${currentIndex === i ? 'bold' : 'normal'}" onclick="selectExercise(${i})">
-                    <span>${i+1}. ${ex.titulo}</span>
-                    <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>
-                </div>
-            `).join('');
-        }
-
-        function selectExercise(i) {
-            currentIndex = i;
-            renderBook();
-        }
-
-        function goHome(btn) {
-            updateActiveTab(btn);
-            currentIndex = -1;
             filteredExercises = [...allExercises];
             renderBook();
+        } catch (e) {
+            console.error("Error cargando datos:", e);
+            document.getElementById('book-inner').innerHTML = `
+                <div class="page" style="text-align:center; justify-content:center;">
+                    <h2 style="color:var(--dorado)">⚠️ No se pudo conectar con el libro.</h2>
+                    <p>Verifica que el archivo esté publicado en la Web como CSV.</p>
+                </div>`;
         }
+    }
 
-        function changeCategory(cat, btn) {
-            updateActiveTab(btn);
-            filteredExercises = allExercises.filter(e => e.cat.includes(cat));
-            currentIndex = filteredExercises.length > 0 ? 0 : -1;
+    function renderBook() {
+        const container = document.getElementById('book-inner');
+        const total = allExercises.length;
+        const done = completedSet.size;
+        const porcentaje = total > 0 ? Math.round((done/total)*100) : 0;
+
+        if (currentIndex === -1) {
+            container.innerHTML = `
+                <div class="page">
+                    <div class="welcome-screen">
+                        <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 3rem;">Mi Diario de Ballet</h1>
+                        <div style="background: var(--verde-menta); padding: 20px; border-radius: 15px; border: 2px dashed var(--rosa-principal);">
+                            <p style="font-style:italic; font-size:1.3rem; color: var(--texto); margin:0;">"${fraseDia}"</p>
+                        </div>
+                        <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar progreso</button>
+                    </div>
+                </div>
+                <div class="page">
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Ejercicios</h2>
+                    <p>Progreso total: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
+                    <div class="content-area">${generateIndexHTML()}</div>
+                </div>
+            `;
+        } else {
+            const ex = filteredExercises[currentIndex];
+            const isDone = completedSet.has(ex.id);
+            // Se asegura de que la ruta sea img/nombre_archivo.png
+            const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+
+            container.innerHTML = `
+                <div class="page">
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Clases</h2>
+                    <div class="content-area">${generateIndexHTML()}</div>
+                    <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
+                </div>
+                <div class="page">
+                    <div class="exercise-focus">
+                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 2.2rem;">${ex.titulo}</h2>
+                        <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=No+encontrada:+${ex.img}'">
+                        <p style="margin:15px 0; font-size: 1.1rem; color:#4E342E;">${ex.desc}</p>
+                        <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:4rem; cursor:pointer; transition: 0.3s transform;">
+                            ${isDone ? '✅' : '⭐'}
+                        </button>
+                    </div>
+                    <button class="arrow arrow-next" onclick="nextPage()">➡</button>
+                </div>
+            `;
+        }
+    }
+
+    function generateIndexHTML() {
+        return filteredExercises.map((ex, i) => `
+            <div class="index-item" style="font-weight: ${currentIndex === i ? 'bold' : 'normal'}; background: ${currentIndex === i ? '#fff5f6' : 'transparent'}" onclick="selectExercise(${i})">
+                <span>${i+1}. ${ex.titulo}</span>
+                <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>
+            </div>
+        `).join('');
+    }
+
+    function selectExercise(i) { currentIndex = i; renderBook(); }
+    function goHome(btn) { updateActiveTab(btn); currentIndex = -1; filteredExercises = [...allExercises]; renderBook(); }
+    
+    function changeCategory(cat, btn) {
+        updateActiveTab(btn);
+        filteredExercises = allExercises.filter(e => e.cat.toLowerCase().includes(cat.toLowerCase()));
+        currentIndex = filteredExercises.length > 0 ? 0 : -1;
+        renderBook();
+    }
+
+    function updateActiveTab(btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function toggleStar(id) {
+        if(completedSet.has(id)) {
+            completedSet.delete(id);
+        } else {
+            completedSet.add(id);
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+        }
+        localStorage.setItem('balletProgress', JSON.stringify(Array.from(completedSet)));
+        renderBook();
+    }
+
+    function resetProgress() {
+        if(confirm("¿Quieres borrar todas tus estrellas?")) {
+            completedSet.clear();
+            localStorage.removeItem('balletProgress');
             renderBook();
         }
+    }
 
-        function updateActiveTab(btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+    function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderBook(); } }
+    function prevPage() { if (currentIndex > 0) { currentIndex--; renderBook(); } }
 
-        function toggleStar(id) {
-            if(completedSet.has(id)) {
-                completedSet.delete(id);
-            } else {
-                completedSet.add(id);
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
-            }
-            localStorage.setItem('balletProgress', JSON.stringify(Array.from(completedSet)));
-            renderBook();
-        }
-
-        function resetProgress() {
-            if(confirm("¿Quieres borrar todas tus estrellas?")) {
-                completedSet.clear();
-                localStorage.removeItem('balletProgress');
-                renderBook();
-            }
-        }
-
-        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderBook(); } }
-        function prevPage() { if (currentIndex > 0) { currentIndex--; renderBook(); } }
-
-        init();
-    </script>
+    init();
+</script>
 </body>
 </html>
