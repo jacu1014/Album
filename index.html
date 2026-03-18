@@ -119,7 +119,9 @@
             font-family: 'Quicksand';
             font-weight: bold;
             margin-top: 20px;
+            transition: 0.3s;
         }
+        .btn-reset:hover { background: var(--dorado); color: white; }
 
         @media (max-width: 800px) {
             .book-content { flex-direction: column; height: auto; }
@@ -132,7 +134,7 @@
 
     <div class="main-wrapper">
         <div class="side-tabs">
-            <button class="tab-btn active" onclick="goHome(this)">🏠</button>
+            <button class="tab-btn active" id="btn-home" onclick="goHome(this)">🏠</button>
             <button class="tab-btn" onclick="changeCategory('Pies', this)">🩰</button>
             <button class="tab-btn" onclick="changeCategory('Brazos', this)">👐</button>
             <button class="tab-btn" onclick="changeCategory('Movimiento', this)">✨</button>
@@ -146,25 +148,38 @@
 
     <script>
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
-        // URL para Ejercicios (gid=0) y Configuración (gid=1864195759 - Ajusta si el ID es distinto)
-        const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
-        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1864195759`;
+        const GID_EJERCICIOS = '0';
+        const GID_CONFIG = '1864195759'; 
+
+        const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_EJERCICIOS}`;
+        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_CONFIG}`;
         
         let allExercises = [];
         let filteredExercises = [];
-        let currentIndex = -1; // -1 significa que estamos en la pantalla de inicio
-        let fraseDia = "¡Es un gran día para bailar!";
+        let currentIndex = -1; 
+        let fraseDia = "¡A bailar!";
         let completedSet = new Set();
+
+        // Cargar progreso de localStorage para que no se pierda al refrescar
+        if(localStorage.getItem('balletProgress')) {
+            completedSet = new Set(JSON.parse(localStorage.getItem('balletProgress')));
+        }
 
         async function init() {
             try {
-                // Cargar Configuración
+                // 1. Cargar Configuración primero
                 const resConfig = await fetch(URL_CONFIG);
                 const csvConfig = await resConfig.text();
-                const configRows = csvConfig.split('\n');
-                if(configRows[1]) fraseDia = configRows[1].split(',')[1]?.replace(/"/g, '') || fraseDia;
+                const configLines = csvConfig.split('\n');
+                
+                // Buscar la fila que contiene "MensajeDelDia"
+                const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
+                if (filaMensaje) {
+                    // Tomamos todo lo que esté después de la primera coma para evitar errores si el mensaje tiene comas
+                    fraseDia = filaMensaje.substring(filaMensaje.indexOf(",") + 1).replace(/"/g, '').trim();
+                }
 
-                // Cargar Ejercicios
+                // 2. Cargar Ejercicios
                 const resEx = await fetch(URL_EJERCICIOS);
                 const csvEx = await resEx.text();
                 const rows = csvEx.split('\n').slice(1); 
@@ -183,34 +198,40 @@
                 filteredExercises = [...allExercises];
                 renderBook();
             } catch (e) {
-                console.error("Error:", e);
-                document.getElementById('book-inner').innerHTML = "<p style='padding:20px; color:red'>⚠️ Error de conexión con el diario.</p>";
+                console.error("Error en init:", e);
+                document.getElementById('book-inner').innerHTML = "<p style='padding:20px;'>Cargando diario... revisa tu conexión.</p>";
             }
         }
 
         function renderBook() {
             const container = document.getElementById('book-inner');
-            
+            const total = allExercises.length;
+            const done = completedSet.size;
+            const porcentaje = total > 0 ? Math.round((done/total)*100) : 0;
+
             if (currentIndex === -1) {
-                // MODO INICIO: Frase Izquierda | Índice Derecha
                 container.innerHTML = `
                     <div class="page">
                         <div class="welcome-screen">
-                            <h1 style="font-family:'Dancing Script'; color:var(--dorado)">Mi Diario</h1>
-                            <p style="font-style:italic; font-size:1.2rem;">"${fraseDia}"</p>
+                            <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 3rem;">Mi Diario</h1>
+                            <div style="background: var(--verde-menta); padding: 20px; border-radius: 15px; border: 2px dashed var(--rosa-principal);">
+                                <p style="font-style:italic; font-size:1.3rem; color: var(--texto); margin:0;">"${fraseDia}"</p>
+                            </div>
                             <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar estrellas</button>
                         </div>
                     </div>
                     <div class="page">
-                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice</h2>
+                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Clases</h2>
+                        <p>Progreso: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
                         <div class="content-area">${generateIndexHTML()}</div>
                     </div>
                 `;
             } else {
-                // MODO NAVEGACIÓN: Índice Izquierda | Ejercicio Derecha
                 const ex = filteredExercises[currentIndex];
                 const isDone = completedSet.has(ex.id);
+                // NOTA: Aquí se construye la ruta. Revisa la consola del navegador (F12) para ver si es correcta.
                 const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+                console.log("Cargando imagen:", imagePath);
 
                 container.innerHTML = `
                     <div class="page">
@@ -220,10 +241,10 @@
                     </div>
                     <div class="page">
                         <div class="exercise-focus">
-                            <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">${ex.titulo}</h2>
-                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error+al+cargar'">
-                            <p style="margin:15px 0; font-style:italic; font-size: 0.9rem; color:#555;">${ex.desc}</p>
-                            <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer;">
+                            <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 2.2rem;">${ex.titulo}</h2>
+                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Archivo+no+encontrado:+${ex.img}'">
+                            <p style="margin:15px 0; font-style:italic; color:#555;">${ex.desc}</p>
+                            <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:4rem; cursor:pointer;">
                                 ${isDone ? '✅' : '⭐'}
                             </button>
                         </div>
@@ -272,12 +293,15 @@
                 completedSet.add(id);
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
             }
+            // Guardar en localStorage
+            localStorage.setItem('balletProgress', JSON.stringify(Array.from(completedSet)));
             renderBook();
         }
 
         function resetProgress() {
-            if(confirm("¿Quieres borrar todas tus estrellas de hoy?")) {
+            if(confirm("¿Quieres borrar todas tus estrellas y empezar de nuevo?")) {
                 completedSet.clear();
+                localStorage.removeItem('balletProgress');
                 renderBook();
             }
         }
