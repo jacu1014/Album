@@ -20,68 +20,125 @@
         body {
             font-family: 'Quicksand', sans-serif;
             background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
-            margin: 0; color: var(--texto); min-height: 100vh;
+            margin: 0;
+            color: var(--texto);
+            min-height: 100vh;
         }
 
         /* Barra de Progreso */
         #progress-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 12px;
-            background: rgba(255,255,255,0.5); z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.5);
+            z-index: 1000;
         }
         #progress-bar {
-            width: 0%; height: 100%; background: linear-gradient(to right, var(--dorado), #FFF176);
-            box-shadow: 0 0 10px var(--dorado); transition: width 0.5s ease;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, var(--dorado), #FFF176);
+            box-shadow: 0 0 10px var(--dorado);
+            transition: width 0.5s ease;
         }
 
-        /* Menú Inferior */
+        /* Menú Flotante */
         nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.95); padding: 10px 25px; border-radius: 40px;
-            display: flex; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px); z-index: 100; border: 2px solid var(--rosa-principal);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 25px;
+            border-radius: 40px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border: 2px solid var(--rosa-principal);
         }
 
-        .nav-item { cursor: pointer; font-size: 24px; transition: 0.3s; filter: grayscale(1); }
-        .nav-item.active { filter: grayscale(0); transform: scale(1.3); }
+        .nav-item {
+            cursor: pointer;
+            font-size: 24px;
+            transition: 0.3s;
+            filter: grayscale(1);
+        }
+        .nav-item.active {
+            filter: grayscale(0);
+            transform: scale(1.3);
+        }
 
-        .book-page { max-width: 600px; margin: 40px auto 120px; padding: 20px; }
+        /* Libro Contenedor */
+        .book-page {
+            max-width: 600px;
+            margin: 40px auto 120px;
+            padding: 20px;
+        }
+
         header { text-align: center; margin-bottom: 30px; }
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.8rem; color: var(--dorado); margin: 0; }
-        #daily-message { font-style: italic; color: #888; margin-top: 10px; font-size: 1.1rem; padding: 0 10px; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.8rem; color: var(--dorado); margin-bottom: 5px; }
+        
+        #daily-message {
+            font-style: italic;
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
 
         /* Tarjetas de Ejercicios */
         .exercise-card {
-            background: var(--blanco-papel); border-radius: 15px; padding: 20px;
-            margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex; align-items: center; gap: 15px; animation: slideIn 0.5s ease;
+            background: var(--blanco-papel);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.5s ease;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
 
         .icon-box {
-            width: 60px; height: 60px; background: var(--verde-menta);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 25px;
+            width: 60px;
+            height: 60px;
+            background: var(--verde-menta);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
         }
 
         .card-body { flex: 1; }
-        .card-body h3 { margin: 0; font-size: 1.1rem; color: #333; }
-        .card-body p { margin: 5px 0 0; font-size: 0.85rem; color: #666; line-height: 1.3; }
+        .card-body h3 { margin: 0; font-size: 1.1rem; }
+        .card-body p { margin: 5px 0 0; font-size: 0.9rem; color: #666; }
 
         .btn-check {
-            background: white; border: 2px solid var(--rosa-principal);
-            width: 45px; height: 45px; border-radius: 50%;
-            cursor: pointer; font-size: 20px; transition: 0.3s;
+            background: white;
+            border: 2px solid var(--rosa-principal);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: 0.3s;
         }
 
-        .btn-check.done { background: var(--dorado); color: white; border-color: var(--dorado); }
-
-        #reset-btn {
-            display: block; margin: 20px auto; background: none; border: 1px dashed var(--dorado);
-            color: var(--dorado); padding: 8px 15px; border-radius: 10px; cursor: pointer;
-            font-family: 'Quicksand', sans-serif;
+        .btn-check.done {
+            background: var(--dorado);
+            color: white;
+            border-color: var(--dorado);
         }
 
-        #loader { text-align: center; padding: 50px; color: var(--dorado); font-weight: bold; }
+        #loader { text-align: center; margin-top: 50px; font-size: 1.2rem; color: var(--dorado); }
     </style>
 </head>
 <body>
@@ -89,79 +146,70 @@
     <div id="progress-container"><div id="progress-bar"></div></div>
 
     <nav>
-        <div class="nav-item active" onclick="filterData('Todos', this)">🏠</div>
-        <div class="nav-item" onclick="filterData('Pies', this)">🩰</div>
-        <div class="nav-item" onclick="filterData('Brazos', this)">👐</div>
-        <div class="nav-item" onclick="filterData('Movimiento', this)">✨</div>
+        <div class="nav-item active" title="Todo" onclick="filterData('Todos', this)">🏠</div>
+        <div class="nav-item" title="Pies" onclick="filterData('Pies', this)">🩰</div>
+        <div class="nav-item" title="Brazos" onclick="filterData('Brazos', this)">👐</div>
+        <div class="nav-item" title="Movimiento" onclick="filterData('Movimiento', this)">✨</div>
     </nav>
 
     <div class="book-page">
         <header>
             <h1>Mi Diario de Ballet</h1>
-            <div id="daily-message">Inspiración en camino...</div>
+            <div id="daily-message">Cargando inspiración...</div>
         </header>
 
-        <div id="loader">✨ Abriendo el libro de ballet...</div>
+        <div id="loader">Abriendo el libro mágico...</div>
         <div id="exercise-list"></div>
-        <button id="reset-btn" onclick="resetDay()">🔄 Reiniciar estrellas de hoy</button>
     </div>
 
     <audio id="pop-sound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
 
     <script>
+        // ID de tu hoja de Google
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
-        
-        // URLs dinámicas para las dos hojas
+        // URL específica para la pestaña "Ejercicios" (gid=0 por defecto es la primera hoja)
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Ejercicios`;
-        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuración`;
+        const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuracion`;
 
         let allExercises = [];
         let doneTasks = 0;
 
-        // Limpiador de JSON para evitar errores de Google
-        function parseGoogleResponse(text) {
-            const base64 = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-            return JSON.parse(base64);
-        }
-
         async function loadData() {
             try {
-                // 1. Cargar Mensaje del Día (Hoja Configuración)
+                // 1. Cargar Mensaje del Día
                 const resConfig = await fetch(URL_CONFIG);
                 const textConfig = await resConfig.text();
-                const jsonConfig = parseGoogleResponse(textConfig);
-                // El mensaje está en la fila 0 (MensajeDelDia), columna Valor (índice 1)
-                const mensaje = jsonConfig.table.rows[0]?.c[1]?.v || "¡Hoy vas a brillar!";
+                const jsonConfig = JSON.parse(textConfig.substr(47).slice(0, -2));
+                // Asumimos que el mensaje está en la celda B2 (fila 0 de datos, columna 1)
+                const mensaje = jsonConfig.table.rows[0].c[1]?.v || "¡A bailar!";
                 document.getElementById('daily-message').innerText = `"${mensaje}"`;
 
                 // 2. Cargar Ejercicios
                 const resEx = await fetch(URL_EJERCICIOS);
                 const textEx = await resEx.text();
-                const jsonEx = parseGoogleResponse(textEx);
+                const jsonEx = JSON.parse(textEx.substr(47).slice(0, -2));
                 
                 allExercises = jsonEx.table.rows.map(r => ({
                     cat: r.c[1]?.v || 'General',
                     titulo: r.c[2]?.v || 'Ejercicio',
                     desc: r.c[3]?.v || '',
-                    icon: getIcon(r.c[1]?.v || '')
+                    icon: getIcon(r.c[1]?.v)
                 }));
 
                 document.getElementById('loader').style.display = 'none';
                 render(allExercises);
 
             } catch (e) {
-                console.error("Error cargando datos:", e);
-                document.getElementById('loader').innerHTML = "⚠️ No se pudo conectar con el libro.<br><small>Verifica que el archivo de Google Sheets esté compartido.</small>";
+                console.error("Error cargando:", e);
+                document.getElementById('loader').innerText = "Revisa que tu hoja esté publicada en la web.";
             }
         }
 
         function getIcon(cat) {
-            const c = cat.toLowerCase();
-            if(c.includes('pies')) return '👣';
-            if(c.includes('brazos')) return '👐';
-            if(c.includes('movimiento')) return '✨';
-            if(c.includes('postura')) return '👑';
-            return '🩰';
+            if(cat === 'Pies') return '🩰';
+            if(cat === 'Brazos') return '👐';
+            if(cat === 'Movimiento') return '✨';
+            return '🌸';
         }
 
         function render(data) {
@@ -186,7 +234,7 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             if(cat === 'Todos') render(allExercises);
-            else render(allExercises.filter(e => e.cat.toLowerCase().includes(cat.toLowerCase())));
+            else render(allExercises.filter(e => e.cat === cat));
         }
 
         function completeTask(btn) {
@@ -194,8 +242,14 @@
                 btn.classList.add('done');
                 btn.innerText = '✔';
                 doneTasks++;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#FADADD', '#D4AF37'] });
-                try { document.getElementById('pop-sound').play(); } catch(e){}
+                
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FADADD', '#D4AF37']
+                });
+                document.getElementById('pop-sound').play();
             } else {
                 btn.classList.remove('done');
                 btn.innerText = '⭐';
@@ -205,20 +259,8 @@
         }
 
         function updateProgress() {
-            const total = allExercises.length || 1;
-            const percent = (doneTasks / total) * 100;
+            const percent = (doneTasks / allExercises.length) * 100;
             document.getElementById('progress-bar').style.width = percent + '%';
-            if(percent === 100) {
-                setTimeout(() => alert("¡Eres una estrella mágica! Completaste todo por hoy. 🌟🩰"), 500);
-            }
-        }
-
-        function resetDay() {
-            if(confirm("¿Quieres volver a empezar tus ejercicios de hoy?")) {
-                doneTasks = 0;
-                document.getElementById('progress-bar').style.width = '0%';
-                render(allExercises);
-            }
         }
 
         loadData();
