@@ -19,18 +19,16 @@
         body {
             font-family: 'Quicksand', sans-serif;
             background: #1a2a2a; 
-            margin: 0; padding: 20px;
+            margin: 0; padding: 10px;
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Estructura General */
         .main-wrapper {
             display: flex; align-items: center;
-            width: 100%; max-width: 1000px; gap: 0;
+            width: 100%; max-width: 1100px;
         }
 
-        /* Pestañas laterales (Filtros) */
         .side-tabs {
             display: flex; flex-direction: column; gap: 8px;
             z-index: 1; margin-right: -5px;
@@ -38,101 +36,79 @@
 
         .tab-btn {
             background: var(--rosa-principal); border: none;
-            border-radius: 12px 0 0 12px; padding: 18px;
-            cursor: pointer; font-size: 1.6rem; transition: 0.3s;
+            border-radius: 12px 0 0 12px; padding: 15px;
+            cursor: pointer; font-size: 1.4rem; transition: 0.3s;
             box-shadow: -4px 4px 10px rgba(0,0,0,0.3);
         }
 
-        .tab-btn.active {
-            background: var(--blanco-papel); transform: translateX(8px);
-        }
+        .tab-btn.active { background: var(--blanco-papel); transform: translateX(8px); }
 
-        /* Libro Contenedor */
         .book-container {
             flex: 1; background: var(--azul-borde);
-            padding: 15px; border-radius: 15px;
+            padding: 12px; border-radius: 15px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.6);
             position: relative; z-index: 2;
         }
 
         .book-content {
             background: var(--blanco-papel);
-            display: flex; min-height: 600px;
+            display: flex; min-height: 550px; height: 85vh;
             border-radius: 5px; position: relative;
             background-image: linear-gradient(to right, #e0e0e0 0%, #fff 5%, #fff 45%, #b1b1b1 50%, #fff 55%, #fff 95%, #e0e0e0 100%);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.05);
         }
 
-        /* Páginas */
         .page {
-            flex: 1; padding: 40px;
+            flex: 1; padding: 30px 40px;
             display: flex; flex-direction: column;
-            transition: opacity 0.4s ease;
+            position: relative;
         }
 
-        /* Elementos de Ejercicio Único */
-        .exercise-focus {
-            text-align: center; animation: fadeInPage 0.6s ease;
+        /* AJUSTE DEL ÍNDICE PARA QUE NO CHOQUE CON FLECHAS */
+        .index-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 50px; /* Espacio para las flechas */
+            padding-right: 10px;
         }
 
-        .exercise-focus h2 {
-            font-family: 'Dancing Script', cursive;
-            color: var(--dorado); font-size: 2.2rem; margin: 0 0 15px;
-        }
+        /* Estilo del Scrollbar del índice */
+        .index-container::-webkit-scrollbar { width: 5px; }
+        .index-container::-webkit-scrollbar-thumb { background: var(--rosa-principal); border-radius: 10px; }
 
-        .img-large {
-            width: 100%; max-height: 300px; object-fit: cover;
-            border: 8px solid white; border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-
-        .desc-large {
-            font-size: 1.1rem; line-height: 1.6; color: var(--texto);
-            margin: 20px 0; font-style: italic;
-        }
-
-        /* Botón Estrella Gigante */
-        .star-container { margin-top: auto; text-align: center; }
-        .big-star {
-            background: white; border: 3px solid var(--rosa-principal);
-            width: 70px; height: 70px; border-radius: 50%;
-            font-size: 30px; cursor: pointer; transition: 0.3s;
-        }
-        .big-star.done { background: var(--dorado); color: white; border-color: var(--dorado); transform: scale(1.1); }
-
-        /* Controles de Navegación */
-        .nav-arrows {
-            position: absolute; bottom: 20px; width: 100%;
-            display: flex; justify-content: space-between; padding: 0 40px;
-            box-sizing: border-box; z-index: 10;
-        }
-
-        .arrow {
-            background: rgba(0,0,0,0.05); border: none; font-size: 2rem;
-            cursor: pointer; border-radius: 50%; width: 50px; height: 50px;
-            transition: 0.3s; color: var(--texto);
-        }
-        .arrow:hover { background: var(--rosa-principal); }
-
-        /* Índice y Progreso */
-        .index-list { list-style: none; padding: 0; text-align: left; }
         .index-item {
-            padding: 8px 0; border-bottom: 1px dashed #eee;
+            padding: 10px 0; border-bottom: 1px dashed #eee;
             cursor: pointer; display: flex; justify-content: space-between;
+            font-size: 0.95rem;
         }
-        .index-item:hover { color: var(--dorado); }
+
+        /* POSICIONAMIENTO DE FLECHAS TIPO LIBRO REAL */
+        .arrow {
+            position: absolute; bottom: 20px;
+            background: #4a90e2; color: white; border: none;
+            width: 40px; height: 40px; border-radius: 8px;
+            cursor: pointer; font-size: 1.2rem; display: flex;
+            align-items: center; justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 20;
+        }
+        .arrow-prev { left: 20px; }
+        .arrow-next { right: 20px; }
+
+        .exercise-focus { text-align: center; }
+        .img-large {
+            width: 100%; max-height: 250px; object-fit: contain;
+            border: 5px solid white; border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
         .progress-box {
-            background: var(--verde-menta); padding: 25px;
-            border-radius: 20px; text-align: center; margin-bottom: 20px;
+            background: #f0fafa; padding: 15px; border-radius: 15px;
+            text-align: center; margin-bottom: 15px;
         }
-        .circle-percent { font-size: 3rem; font-weight: bold; color: var(--dorado); }
-
-        @keyframes fadeInPage { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 800px) {
-            .book-content { flex-direction: column; background-image: none; }
-            .page-right { border-top: 2px solid #eee; }
+            .book-content { flex-direction: column; }
+            .page { height: 50%; }
         }
     </style>
 </head>
@@ -149,32 +125,26 @@
         <div class="book-container">
             <div class="book-content">
                 <div class="page">
-                    <h1>Resumen</h1>
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado)">Índice de Ejercicios</h2>
                     <div class="progress-box">
-                        <div class="circle-percent" id="ui-percent">0%</div>
-                        <div id="ui-stars">0 / 0 Estrellas</div>
+                        <strong id="ui-percent">0%</strong> completado | <span id="ui-stars">0/0</span> ⭐
                     </div>
-                    <h3>Índice de Ejercicios</h3>
-                    <div class="index-list" id="ui-index">
+                    <div class="index-container" id="ui-index">
                         </div>
+                    <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
                 </div>
 
                 <div class="page" id="page-render">
                     </div>
-
-                <div class="nav-arrows">
-                    <button class="arrow" onclick="prevPage()">⬅️</button>
-                    <button class="arrow" onclick="nextPage()">➡️</button>
-                </div>
+                <button class="arrow arrow-next" onclick="nextPage()">➡</button>
             </div>
         </div>
     </div>
 
-    <audio id="pop-sound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
-
     <script>
+        // URL corregida para evitar errores de CORS y conexión
         const SHEET_ID = '1KcKRT5gZqatDkeRsQQa6_aWBr9gnrkGRR1vsmZjmRoI';
-        const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Ejercicios`;
+        const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
         
         let allExercises = [];
         let filteredExercises = [];
@@ -184,51 +154,48 @@
         async function init() {
             try {
                 const res = await fetch(URL_EJERCICIOS);
-                const text = await res.text();
-                const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+                const csvData = await res.text();
+                const rows = csvData.split('\n').slice(1); // Saltar encabezado
                 
-                allExercises = json.table.rows.map((r, i) => ({
-                    id: i,
-                    cat: r.c[1]?.v || 'Varios',
-                    titulo: r.c[2]?.v || 'Ejercicio',
-                    desc: r.c[3]?.v || 'Sin descripción disponible.',
-                    img: r.c[4]?.v || 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=500'
-                }));
+                allExercises = rows.map((row, i) => {
+                    const cols = row.split(','); // Nota: Esto es básico, si hay comas en el texto usa un parser CSV
+                    return {
+                        id: i,
+                        cat: cols[1] || 'Varios',
+                        titulo: cols[2] || 'Ejercicio',
+                        desc: cols[3] || '',
+                        img: cols[4] || ''
+                    };
+                });
 
                 filteredExercises = [...allExercises];
                 updateUI();
                 renderPage();
-            } catch (e) { console.error("Error cargando el libro:", e); }
+            } catch (e) {
+                console.error("Error cargando datos:", e);
+                document.getElementById('ui-index').innerHTML = "<p style='color:red'>⚠️ Error al conectar con Google Sheets. Verifica que esté publicado.</p>";
+            }
         }
 
         function renderPage() {
             const container = document.getElementById('page-render');
             const ex = filteredExercises[currentIndex];
-
-            if (!ex) {
-                container.innerHTML = "<h2>¡Selecciona una categoría!</h2>";
-                return;
-            }
+            if (!ex) return;
 
             const isDone = completedSet.has(ex.id);
-
             container.innerHTML = `
                 <div class="exercise-focus">
-                    <small style="color:var(--dorado)">${ex.cat} • Página ${currentIndex + 1}</small>
-                    <h2>${ex.titulo}</h2>
-                    <img src="${ex.img}" class="img-large" onerror="this.src='https://via.placeholder.com/500x350?text=Ballet'">
-                    <p class="desc-large">${ex.desc}</p>
-                    <div class="star-container">
-                        <button class="big-star ${isDone ? 'done' : ''}" onclick="toggleStar(${ex.id})">
-                            ${isDone ? '✔' : '⭐'}
-                        </button>
-                    </div>
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado)">${ex.titulo}</h2>
+                    <img src="${ex.img.trim()}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Ballet'">
+                    <p style="margin:15px 0; font-style:italic">${ex.desc}</p>
+                    <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3rem; cursor:pointer">
+                        ${isDone ? '✅' : '⭐'}
+                    </button>
                 </div>
             `;
         }
 
         function updateUI() {
-            // Actualizar Índice
             const indexList = document.getElementById('ui-index');
             indexList.innerHTML = '';
             filteredExercises.forEach((ex, i) => {
@@ -239,43 +206,28 @@
                 indexList.appendChild(item);
             });
 
-            // Actualizar Progreso
             const total = allExercises.length;
             const done = completedSet.size;
-            const pc = total > 0 ? Math.round((done / total) * 100) : 0;
-            document.getElementById('ui-percent').innerText = pc + '%';
-            document.getElementById('ui-stars').innerText = `${done} / ${total} Estrellas`;
+            document.getElementById('ui-percent').innerText = total > 0 ? Math.round((done/total)*100) + '%' : '0%';
+            document.getElementById('ui-stars').innerText = `${done}/${total}`;
         }
 
         function toggleStar(id) {
             if(completedSet.has(id)) completedSet.delete(id);
             else {
                 completedSet.add(id);
-                confetti({ particleCount: 150, spread: 100, origin: { y: 0.7 }, colors: ['#FADADD', '#D4AF37'] });
-                document.getElementById('pop-sound').play();
+                confetti({ particleCount: 100, origin: { y: 0.7 } });
             }
             updateUI();
             renderPage();
         }
 
-        function nextPage() {
-            if (currentIndex < filteredExercises.length - 1) {
-                currentIndex++;
-                renderPage();
-            }
-        }
-
-        function prevPage() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderPage();
-            }
-        }
+        function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderPage(); } }
+        function prevPage() { if (currentIndex > 0) { currentIndex--; renderPage(); } }
 
         function changeCategory(cat, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
             filteredExercises = cat === 'Todos' ? [...allExercises] : allExercises.filter(e => e.cat.includes(cat));
             currentIndex = 0;
             updateUI();
