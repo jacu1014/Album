@@ -13,124 +13,139 @@
             --rosa-fuerte: #F8BBD0;
             --verde-menta: #E0F2F1;
             --dorado: #D4AF37;
-            --texto: #4E342E;
-            --blanco-papel: #FFFFFF;
-            --beige-libro: #F9F4F0;
+            --texto: #2C1E1B;
+            --blanco-papel: #FDFDFD;
+            --azul-borde: #00BCD4; /* El azul cian de la imagen de referencia */
         }
 
         body {
             font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
-            margin: 0; color: var(--texto); min-height: 100vh;
+            background: #1a2a2a; /* Fondo oscuro para resaltar el libro */
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* Contenedor del Libro Abierto */
+        .book-frame {
+            background: var(--azul-borde);
+            padding: 15px; border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            width: 95%; max-width: 1000px;
+            position: relative;
+        }
+
+        .book-pages {
+            background: var(--blanco-papel);
+            display: flex; min-height: 600px;
+            position: relative; border-radius: 4px;
+            overflow: hidden;
+            background-image: linear-gradient(to right, #e0e0e0 0%, #ffffff 5%, #ffffff 45%, #d1d1d1 50%, #ffffff 55%, #ffffff 95%, #e0e0e0 100%);
+        }
+
+        /* Sombra central (el lomo del libro) */
+        .book-pages::before {
+            content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 2px; background: rgba(0,0,0,0.1); transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Página Izquierda (Mensaje y Filtros) */
+        .page-left {
+            flex: 1; padding: 40px; border-right: 1px solid rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* Barra de Progreso */
-        #progress-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 12px;
-            background: rgba(255,255,255,0.5); z-index: 1000;
-        }
-        #progress-bar {
-            width: 0%; height: 100%; background: linear-gradient(to right, var(--dorado), #FFF176);
-            box-shadow: 0 0 10px var(--dorado); transition: width 0.5s ease;
+        /* Página Derecha (Ejercicios) */
+        .page-right {
+            flex: 1; padding: 40px;
+            overflow-y: auto; max-height: 700px;
         }
 
-        /* Menú Inferior */
-        nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.98); padding: 10px 25px; border-radius: 40px;
-            display: flex; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px); z-index: 100; border: 2px solid var(--rosa-principal);
-        }
-        .nav-item { cursor: pointer; font-size: 24px; transition: 0.3s; filter: grayscale(1); }
-        .nav-item.active { filter: grayscale(0); transform: scale(1.3); }
+        /* Títulos estilo Libro de Arena */
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: #d32f2f; margin-bottom: 5px; text-align: center; }
+        .subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--texto); margin-bottom: 20px; }
 
-        /* Contenedor tipo Libro */
-        .book-container {
-            width: 90%; max-width: 500px; margin-top: 40px; margin-bottom: 120px;
-            perspective: 1000px;
+        .message-quote {
+            font-style: italic; text-align: center; border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc; padding: 20px 0; margin: 20px 0;
+            line-height: 1.6; color: #444; width: 100%;
         }
 
-        header { 
-            background: var(--blanco-papel); padding: 30px 20px; 
-            border-radius: 20px 20px 5px 5px; text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-bottom: 2px dashed var(--rosa-principal);
-        }
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: var(--dorado); margin: 0; }
-        
-        .message-box {
-            background: var(--beige-libro); margin-top: 15px; padding: 15px;
-            border-left: 4px solid var(--dorado); font-style: italic; border-radius: 5px;
+        /* Estilo de los ejercicios dentro del libro */
+        .exercise-item {
+            margin-bottom: 30px; border-bottom: 1px dashed #ddd; padding-bottom: 20px;
+            animation: fadeIn 0.8s ease;
         }
 
-        /* Tarjetas Estilo Página */
-        #exercise-list { display: flex; flex-direction: column; gap: 20px; margin-top: 10px; }
-
-        .exercise-card {
-            background: var(--blanco-papel); border-radius: 10px; overflow: hidden;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.08); border: 1px solid #eee;
-            transition: transform 0.3s;
+        .exercise-img {
+            width: 100%; border-radius: 5px; margin-bottom: 15px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1); border: 5px solid white;
         }
 
-        .img-preview {
-            width: 100%; height: 200px; background: #f0f0f0;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            position: relative;
-        }
-        .img-preview img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .cat-tag {
-            position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9);
-            padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
-            color: var(--dorado); border: 1px solid var(--dorado);
-        }
+        .exercise-info h3 { font-family: 'Quicksand', sans-serif; margin: 0; color: #d32f2f; font-size: 1.1rem; }
+        .exercise-info p { font-size: 0.9rem; color: #555; line-height: 1.4; margin: 5px 0; }
 
-        .card-content { padding: 20px; display: flex; align-items: flex-start; gap: 15px; }
-        
-        .icon-circle {
-            min-width: 50px; height: 50px; background: var(--verde-menta);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px;
+        .btn-star {
+            background: none; border: 2px solid var(--rosa-principal);
+            border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px;
+            transition: 0.3s;
         }
+        .btn-star.done { background: var(--dorado); border-color: var(--dorado); color: white; }
 
-        .text-info { flex: 1; }
-        .text-info h3 { margin: 0; font-size: 1.1rem; color: #333; }
-        .text-info p { margin: 8px 0 0; font-size: 0.9rem; color: #777; line-height: 1.4; }
-
-        .btn-check {
-            background: white; border: 2px solid var(--rosa-principal);
-            min-width: 50px; height: 50px; border-radius: 50%;
-            cursor: pointer; font-size: 20px; transition: 0.3s; align-self: center;
+        /* Navegación dentro del libro */
+        .book-nav { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
+        .nav-icon { 
+            font-size: 1.5rem; cursor: pointer; transition: 0.3s; opacity: 0.5;
         }
-        .btn-check.done { background: var(--dorado); color: white; border-color: var(--dorado); transform: scale(1.1); }
+        .nav-icon.active { opacity: 1; transform: scale(1.2); }
 
-        #reset-btn {
-            background: none; border: none; color: #999; text-decoration: underline;
-            margin: 20px auto; display: block; cursor: pointer; font-size: 0.8rem;
+        /* Detalles de esquinas dobladas */
+        .corner {
+            position: absolute; bottom: 0; width: 50px; height: 50px;
+            background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%, #ddd 100%);
+            z-index: 20;
+        }
+        .corner-left { left: 0; transform: scaleX(-1); }
+        .corner-right { right: 0; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Adaptación móvil (una sola página) */
+        @media (max-width: 768px) {
+            .book-pages { flex-direction: column; }
+            .book-pages::before { display: none; }
+            .page-right { max-height: none; }
         }
     </style>
 </head>
 <body>
 
-    <div id="progress-container"><div id="progress-bar"></div></div>
+    <div class="book-frame">
+        <div class="book-pages">
+            <div class="page-left">
+                <h1>Mi Diario de Ballet</h1>
+                <div class="subtitle">Jorge Luis Ceballos (Papá)</div>
+                
+                <div class="message-quote" id="daily-message">
+                    ... cargando inspiración mágica ...
+                </div>
 
-    <nav>
-        <div class="nav-item active" onclick="filterData('Todos', this)">🏠</div>
-        <div class="nav-item" onclick="filterData('Pies', this)">🩰</div>
-        <div class="nav-item" onclick="filterData('Brazos', this)">👐</div>
-        <div class="nav-item" onclick="filterData('Movimiento', this)">✨</div>
-    </nav>
+                <div class="book-nav">
+                    <span class="nav-icon active" onclick="filterData('Todos', this)">🏠</span>
+                    <span class="nav-icon" onclick="filterData('Pies', this)">🩰</span>
+                    <span class="nav-icon" onclick="filterData('Brazos', this)">👐</span>
+                    <span class="nav-icon" onclick="filterData('Movimiento', this)">✨</span>
+                </div>
+            </div>
 
-    <div class="book-container">
-        <header>
-            <h1>Mi Diario de Ballet</h1>
-            <div class="message-box" id="daily-message">"Abriendo el libro de los sueños..."</div>
-        </header>
+            <div class="page-right" id="exercise-list">
+                <p style="text-align:center">Abriendo el libro...</p>
+            </div>
 
-        <div id="exercise-list">
-            <div id="loader" style="text-align:center; padding: 40px;">✨ Cargando tus páginas mágicas...</div>
+            <div class="corner corner-left"></div>
+            <div class="corner corner-right"></div>
         </div>
-        
-        <button id="reset-btn" onclick="resetDay()">Limpiar todas las estrellas de hoy</button>
     </div>
 
     <audio id="pop-sound" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
@@ -141,7 +156,6 @@
         const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuración`;
 
         let allExercises = [];
-        let doneTasks = 0;
 
         function parseGoogleResponse(text) {
             const base64 = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
@@ -150,13 +164,14 @@
 
         async function loadData() {
             try {
-                // 1. Mensaje de la hoja Configuración
+                // 1. Mensaje de Configuración
                 const resConfig = await fetch(URL_CONFIG);
                 const jsonConfig = parseGoogleResponse(await resConfig.text());
-                const mensaje = jsonConfig.table.rows[0]?.c[1]?.v || "¡A bailar, princesa!";
+                // El mensaje está en la fila 0, columna 1
+                const mensaje = jsonConfig.table.rows[0]?.c[1]?.v || "¡Hoy vas a brillar!";
                 document.getElementById('daily-message').innerText = `"${mensaje}"`;
 
-                // 2. Datos de Ejercicios (Incluyendo la columna 4 para la imagen)
+                // 2. Ejercicios
                 const resEx = await fetch(URL_EJERCICIOS);
                 const jsonEx = parseGoogleResponse(await resEx.text());
                 
@@ -164,23 +179,13 @@
                     cat: r.c[1]?.v || 'Varios',
                     titulo: r.c[2]?.v || 'Sin título',
                     desc: r.c[3]?.v || '',
-                    img: r.c[4]?.v || '', // Columna E en tu Excel
-                    icon: getIcon(r.c[1]?.v || '')
+                    img: r.c[4]?.v || '',
                 }));
 
                 render(allExercises);
             } catch (e) {
-                console.error(e);
-                document.getElementById('exercise-list').innerHTML = "⚠️ Error al cargar el libro.";
+                document.getElementById('exercise-list').innerHTML = "<p>Error al abrir el libro.</p>";
             }
-        }
-
-        function getIcon(cat) {
-            const c = cat.toLowerCase();
-            if(c.includes('pies')) return '👣';
-            if(c.includes('brazos')) return '👐';
-            if(c.includes('movimiento')) return '✨';
-            return '🌸';
         }
 
         function render(data) {
@@ -188,32 +193,26 @@
             list.innerHTML = '';
             
             data.forEach(ex => {
-                const card = document.createElement('div');
-                card.className = 'exercise-card';
+                const item = document.createElement('div');
+                item.className = 'exercise-item';
                 
-                // Si no hay imagen en el Excel, usamos una genérica de ballet
-                const imageSrc = ex.img || 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=500&q=80';
+                // Si hay link de imagen en el Excel (columna E), se usa. Si no, una genérica.
+                const imgSource = ex.img ? ex.img : 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=400&q=80';
 
-                card.innerHTML = `
-                    <div class="img-preview">
-                        <span class="cat-tag">${ex.cat}</span>
-                        <img src="${imageSrc}" alt="${ex.titulo}">
-                    </div>
-                    <div class="card-content">
-                        <div class="icon-circle">${ex.icon}</div>
-                        <div class="text-info">
-                            <h3>${ex.titulo}</h3>
-                            <p>${ex.desc}</p>
-                        </div>
-                        <button class="btn-check" onclick="completeTask(this)">⭐</button>
+                item.innerHTML = `
+                    <img src="${imgSource}" class="exercise-img">
+                    <div class="exercise-info">
+                        <h3>${ex.titulo}</h3>
+                        <p>${ex.desc}</p>
+                        <button class="btn-star" onclick="completeTask(this)">⭐</button>
                     </div>
                 `;
-                list.appendChild(card);
+                list.appendChild(item);
             });
         }
 
         function filterData(cat, el) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-icon').forEach(n => n.classList.remove('active'));
             el.classList.add('active');
             if(cat === 'Todos') render(allExercises);
             else render(allExercises.filter(e => e.cat.toLowerCase().includes(cat.toLowerCase())));
@@ -223,27 +222,16 @@
             if(!btn.classList.contains('done')) {
                 btn.classList.add('done');
                 btn.innerText = '✔';
-                doneTasks++;
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 }, colors: ['#FADADD', '#D4AF37'] });
+                confetti({ 
+                    particleCount: 150, 
+                    spread: 70, 
+                    origin: { y: 0.7 }, 
+                    colors: ['#FADADD', '#D4AF37', '#00BCD4'] 
+                });
                 try { document.getElementById('pop-sound').play(); } catch(e){}
             } else {
                 btn.classList.remove('done');
                 btn.innerText = '⭐';
-                doneTasks--;
-            }
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const percent = (doneTasks / (allExercises.length || 1)) * 100;
-            document.getElementById('progress-bar').style.width = percent + '%';
-        }
-
-        function resetDay() {
-            if(confirm("¿Quieres limpiar las estrellas de hoy?")) {
-                doneTasks = 0;
-                updateProgress();
-                render(allExercises);
             }
         }
 
