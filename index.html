@@ -21,99 +21,111 @@
         body {
             font-family: 'Quicksand', sans-serif;
             background: #1a2a2a; 
-            margin: 0; padding: 10px;
+            margin: 0; padding: 15px;
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh;
         }
 
-        /* Contenedor del Libro */
         .book-frame {
             background: var(--azul-borde);
-            padding: 12px; border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            width: 100%; max-width: 950px;
+            padding: 15px; border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            width: 100%; max-width: 1100px;
             position: relative;
         }
 
         .book-pages {
             background: var(--blanco-papel);
-            display: flex; min-height: 600px;
-            position: relative; border-radius: 5px;
+            display: flex; min-height: 650px;
+            position: relative; border-radius: 8px;
             overflow: hidden;
-            background-image: linear-gradient(to right, #e0e0e0 0%, #ffffff 5%, #ffffff 45%, #d1d1d1 50%, #ffffff 55%, #ffffff 95%, #e0e0e0 100%);
+            background-image: linear-gradient(to right, #e5e5e5 0%, #ffffff 5%, #ffffff 45%, #d1d1d1 50%, #ffffff 55%, #ffffff 95%, #e5e5e5 100%);
         }
 
-        /* Lomo central */
         .book-pages::before {
             content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
-            width: 2px; background: rgba(0,0,0,0.1); transform: translateX(-50%);
+            width: 3px; background: rgba(0,0,0,0.1); transform: translateX(-50%);
             z-index: 10;
         }
 
-        /* Página Izquierda: Título y Configuración */
+        /* LADO IZQUIERDO: Control y Estadísticas */
         .page-left {
-            flex: 1; padding: 30px; border-right: 1px solid rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center; text-align: center;
+            flex: 0.8; padding: 30px; border-right: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        /* Página Derecha: Lista de Ejercicios */
+        /* LADO DERECHO: Cuadrícula de Ejercicios */
         .page-right {
-            flex: 1; padding: 30px;
+            flex: 1.2; padding: 30px;
             overflow-y: auto; max-height: 750px;
         }
 
-        h1 { font-family: 'Dancing Script', cursive; font-size: 2.4rem; color: var(--dorado); margin: 0; }
-        .subtitle { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--texto); margin-top: 5px; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--dorado); margin: 0; text-align: center; }
 
-        .message-box {
-            font-style: italic; border-top: 1px solid var(--rosa-principal);
-            border-bottom: 1px solid var(--rosa-principal);
-            padding: 20px 0; margin: 30px 0; line-height: 1.6;
-            color: var(--texto); width: 100%; font-size: 1.1rem;
+        /* Panel de Estadísticas */
+        .stats-panel {
+            background: var(--verde-menta);
+            width: 100%; border-radius: 15px;
+            padding: 15px; margin: 20px 0;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
         }
+        .stat-item { margin: 10px 0; font-weight: 700; color: var(--texto); }
+        .stat-val { color: var(--dorado); font-size: 1.4rem; display: block; }
 
-        /* Tarjetas dentro del libro */
-        .exercise-item {
-            margin-bottom: 30px; border-bottom: 1px dashed var(--rosa-principal);
-            padding-bottom: 20px; animation: fadeIn 0.8s ease;
+        /* Menú de Navegación Vertical */
+        .nav-menu {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            width: 100%; margin-top: auto;
         }
-
-        .preview-img {
-            width: 100%; border-radius: 8px; margin-bottom: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); border: 4px solid white;
-            display: block;
-        }
-
-        .exercise-info h3 { margin: 0; color: var(--dorado); font-size: 1.2rem; }
-        .exercise-info p { font-size: 0.95rem; color: #666; margin: 8px 0; }
-
-        /* Botón de estrella */
-        .btn-star {
+        .nav-btn {
             background: white; border: 2px solid var(--rosa-principal);
-            border-radius: 50%; width: 45px; height: 45px; cursor: pointer;
-            font-size: 20px; transition: 0.3s;
+            padding: 10px; border-radius: 12px; cursor: pointer;
+            font-size: 1.5rem; transition: 0.3s; display: flex;
+            justify-content: center; align-items: center;
         }
-        .btn-star.done { background: var(--dorado); border-color: var(--dorado); color: white; transform: scale(1.1); }
+        .nav-btn.active { background: var(--rosa-principal); transform: scale(1.05); }
 
-        /* Navegación (Filtros) */
-        nav { display: flex; gap: 15px; margin-top: auto; padding-top: 20px; }
-        .nav-item { font-size: 1.8rem; cursor: pointer; transition: 0.3s; filter: grayscale(1); }
-        .nav-item.active { filter: grayscale(0); transform: scale(1.3); }
-
-        /* Barra de progreso sutil */
-        #progress-bar {
-            position: absolute; bottom: 0; left: 0; height: 4px;
-            background: var(--dorado); transition: width 0.5s ease;
+        /* Cuadrícula de 2 Ejercicios por fila */
+        .exercise-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
         }
+
+        .exercise-slot {
+            background: #fdfdfd; border: 1px solid #eee;
+            padding: 10px; border-radius: 10px;
+            display: flex; flex-direction: column;
+            text-align: center; position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        .slot-title {
+            font-weight: 700; font-size: 0.9rem; margin-bottom: 8px;
+            color: var(--texto); height: 40px; display: flex;
+            align-items: center; justify-content: center;
+        }
+
+        .slot-img {
+            width: 100%; aspect-ratio: 1/1; object-fit: cover;
+            border-radius: 8px; border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .slot-check {
+            position: absolute; bottom: 15px; right: 15px;
+            background: white; border: 2px solid var(--rosa-principal);
+            width: 35px; height: 35px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; z-index: 5;
+        }
+        .slot-check.done { background: var(--dorado); border-color: var(--dorado); color: white; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Responsive Móvil */
         @media (max-width: 768px) {
             .book-pages { flex-direction: column; }
             .book-pages::before { display: none; }
-            .page-right { max-height: none; }
-            .page-left { padding: 20px; min-height: auto; }
+            .exercise-grid { grid-template-columns: 1fr; }
+            .page-left { flex: none; }
         }
     </style>
 </head>
@@ -121,26 +133,29 @@
 
     <div class="book-frame">
         <div class="book-pages">
-            <div id="progress-bar" style="width: 0%"></div>
-
             <div class="page-left">
-                <h1>Mi Diario de Ballet</h1>
-                <div class="subtitle">Mi turno de brillar</div>
+                <h1>Mi Diario</h1>
                 
-                <div class="message-box" id="daily-message">
-                    "Abriendo el libro mágico..."
+                <div class="stats-panel">
+                    <div class="stat-item">Progreso <span class="stat-val" id="stat-pc">0%</span></div>
+                    <div class="stat-item">Estrellas <span class="stat-val" id="stat-stars">0 / 0</span></div>
                 </div>
 
-                <nav>
-                    <div class="nav-item active" onclick="filterData('Todos', this)">🏠</div>
-                    <div class="nav-item" onclick="filterData('Pies', this)">🩰</div>
-                    <div class="nav-item" onclick="filterData('Brazos', this)">👐</div>
-                    <div class="nav-item" onclick="filterData('Movimiento', this)">✨</div>
-                </nav>
+                <div id="daily-message" style="font-style: italic; font-size: 0.9rem; text-align: center; margin-bottom: 20px; color: #666;">
+                    "Cargando..."
+                </div>
+
+                <div class="nav-menu">
+                    <button class="nav-btn active" title="Inicio" onclick="filterData('Todos', this)">🏠</button>
+                    <button class="nav-btn" title="Pies" onclick="filterData('Pies', this)">🩰</button>
+                    <button class="nav-btn" title="Brazos" onclick="filterData('Brazos', this)">👐</button>
+                    <button class="nav-btn" title="Movimiento" onclick="filterData('Movimiento', this)">✨</button>
+                </div>
             </div>
 
-            <div class="page-right" id="exercise-list">
-                <p style="text-align:center; margin-top: 50px;">Buscando tus ejercicios...</p>
+            <div class="page-right">
+                <div class="exercise-grid" id="exercise-grid">
+                    </div>
             </div>
         </div>
     </div>
@@ -153,89 +168,89 @@
         const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Configuracion`;
 
         let allExercises = [];
-        let doneCount = 0;
+        let completedIds = new Set();
 
-        // Función robusta para limpiar el JSON de Google
-        function cleanGoogleJSON(text) {
+        function cleanJSON(text) {
             return JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
         }
 
-        async function loadData() {
+        async function init() {
             try {
-                // 1. Cargar Configuración
-                const resConfig = await fetch(URL_CONFIG);
-                const jsonConfig = cleanGoogleJSON(await resConfig.text());
-                const mensaje = jsonConfig.table.rows[0]?.c[1]?.v || "¡Hoy vas a brillar!";
-                document.getElementById('daily-message').innerText = `"${mensaje}"`;
+                // Mensaje y Configuración
+                const resC = await fetch(URL_CONFIG);
+                const jsonC = cleanJSON(await resC.text());
+                document.getElementById('daily-message').innerText = `"${jsonC.table.rows[0]?.c[1]?.v || '¡A brillar!'}"`;
 
-                // 2. Cargar Ejercicios
-                const resEx = await fetch(URL_EJERCICIOS);
-                const jsonEx = cleanGoogleJSON(await resEx.text());
-                
-                allExercises = jsonEx.table.rows.map(r => ({
-                    cat: r.c[1]?.v || 'Varios',
-                    titulo: r.c[2]?.v || 'Ejercicio',
+                // Ejercicios
+                const resE = await fetch(URL_EJERCICIOS);
+                const jsonE = cleanJSON(await resE.text());
+                allExercises = jsonE.table.rows.map((r, index) => ({
+                    id: index,
+                    cat: r.c[1]?.v || '',
+                    titulo: r.c[2]?.v || 'Sin título',
                     desc: r.c[3]?.v || '',
-                    img: r.c[4]?.v || '' // Columna E para la imagen
+                    img: r.c[4]?.v || 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=400'
                 }));
 
-                render(allExercises);
+                updateStats();
+                render('Todos');
             } catch (e) {
                 console.error(e);
-                document.getElementById('exercise-list').innerHTML = "<p style='text-align:center; color:red;'>⚠️ Error al conectar con el libro. Verifica la publicación.</p>";
             }
         }
 
-        function render(data) {
-            const list = document.getElementById('exercise-list');
-            list.innerHTML = '';
+        function render(filter) {
+            const grid = document.getElementById('exercise-grid');
+            grid.innerHTML = '';
             
-            data.forEach(ex => {
-                const item = document.createElement('div');
-                item.className = 'exercise-item';
-                
-                // Imagen por defecto si la celda está vacía
-                const imgUrl = ex.img || 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=400&q=80';
+            const filtered = filter === 'Todos' ? allExercises : allExercises.filter(e => e.cat.includes(filter));
 
-                item.innerHTML = `
-                    <img src="${imgUrl}" class="preview-img" onerror="this.src='https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=400&q=80'">
-                    <div class="exercise-info">
-                        <h3>${ex.titulo}</h3>
-                        <p>${ex.desc}</p>
-                        <button class="btn-star" onclick="completeTask(this)">⭐</button>
-                    </div>
+            filtered.forEach(ex => {
+                const isDone = completedIds.has(ex.id);
+                const slot = document.createElement('div');
+                slot.className = 'exercise-slot';
+                slot.innerHTML = `
+                    <div class="slot-title">${ex.titulo}</div>
+                    <img src="${ex.img}" class="slot-img" alt="Ballet">
+                    <button class="slot-check ${isDone ? 'done' : ''}" onclick="toggleTask(${ex.id}, this)">
+                        ${isDone ? '✔' : '⭐'}
+                    </button>
                 `;
-                list.appendChild(item);
+                grid.appendChild(slot);
             });
         }
 
-        function filterData(cat, el) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            if(cat === 'Todos') render(allExercises);
-            else render(allExercises.filter(e => e.cat.includes(cat)));
-        }
-
-        function completeTask(btn) {
-            if(!btn.classList.contains('done')) {
-                btn.classList.add('done');
-                btn.innerText = '✔';
-                doneCount++;
-                confetti({ 
-                    particleCount: 100, spread: 70, origin: { y: 0.8 }, 
-                    colors: ['#FADADD', '#D4AF37', '#E0F2F1'] 
-                });
-                try { document.getElementById('pop-sound').play(); } catch(e){}
-            } else {
+        function toggleTask(id, btn) {
+            if (completedIds.has(id)) {
+                completedIds.delete(id);
                 btn.classList.remove('done');
                 btn.innerText = '⭐';
-                doneCount--;
+            } else {
+                completedIds.add(id);
+                btn.classList.add('done');
+                btn.innerText = '✔';
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 }, colors: ['#D4AF37', '#FADADD'] });
+                document.getElementById('pop-sound').play();
             }
-            const progress = (doneCount / allExercises.length) * 100;
-            document.getElementById('progress-bar').style.width = progress + '%';
+            updateStats();
         }
 
-        loadData();
+        function updateStats() {
+            const total = allExercises.length;
+            const done = completedIds.size;
+            const pc = total > 0 ? Math.round((done / total) * 100) : 0;
+            
+            document.getElementById('stat-pc').innerText = pc + '%';
+            document.getElementById('stat-stars').innerText = `${done} / ${total}`;
+        }
+
+        function filterData(cat, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render(cat);
+        }
+
+        init();
     </script>
 </body>
 </html>
