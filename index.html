@@ -151,32 +151,30 @@
         const GID_EJERCICIOS = '0';
         const GID_CONFIG = '1864195759'; 
 
+        // URLs de exportación directa a CSV para evitar bloqueos de CORS
         const URL_EJERCICIOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_EJERCICIOS}`;
         const URL_CONFIG = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_CONFIG}`;
         
         let allExercises = [];
         let filteredExercises = [];
         let currentIndex = -1; 
-        let fraseDia = "¡A bailar!";
+        let fraseDia = "¡Inspiración en camino...";
         let completedSet = new Set();
 
-        // Cargar progreso de localStorage para que no se pierda al refrescar
         if(localStorage.getItem('balletProgress')) {
             completedSet = new Set(JSON.parse(localStorage.getItem('balletProgress')));
         }
 
         async function init() {
             try {
-                // 1. Cargar Configuración primero
+                // 1. Cargar Mensaje del Día
                 const resConfig = await fetch(URL_CONFIG);
                 const csvConfig = await resConfig.text();
                 const configLines = csvConfig.split('\n');
-                
-                // Buscar la fila que contiene "MensajeDelDia"
                 const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
                 if (filaMensaje) {
-                    // Tomamos todo lo que esté después de la primera coma para evitar errores si el mensaje tiene comas
-                    fraseDia = filaMensaje.substring(filaMensaje.indexOf(",") + 1).replace(/"/g, '').trim();
+                    // Extraer texto después de la primera coma
+                    fraseDia = filaMensaje.split(',')[1]?.replace(/"/g, '').trim() || "¡A bailar!";
                 }
 
                 // 2. Cargar Ejercicios
@@ -191,15 +189,19 @@
                         cat: cols[1] || 'Varios',
                         titulo: cols[2] || 'Ejercicio',
                         desc: cols[3] || '',
-                        img: cols[4] || ''
+                        img: cols[4] || '' 
                     };
                 });
 
                 filteredExercises = [...allExercises];
                 renderBook();
             } catch (e) {
-                console.error("Error en init:", e);
-                document.getElementById('book-inner').innerHTML = "<p style='padding:20px;'>Cargando diario... revisa tu conexión.</p>";
+                console.error("Error cargando datos:", e);
+                document.getElementById('book-inner').innerHTML = `
+                    <div class="page" style="text-align:center; justify-content:center;">
+                        <h2 style="color:var(--dorado)">⚠️ No se pudo conectar con el libro.</h2>
+                        <p>Verifica que el archivo de Google Sheets esté <b>publicado en la web</b> como CSV.</p>
+                    </div>`;
             }
         }
 
@@ -229,9 +231,8 @@
             } else {
                 const ex = filteredExercises[currentIndex];
                 const isDone = completedSet.has(ex.id);
-                // NOTA: Aquí se construye la ruta. Revisa la consola del navegador (F12) para ver si es correcta.
+                // Si en el excel dice "postura.png", buscará en la carpeta "img/postura.png"
                 const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
-                console.log("Cargando imagen:", imagePath);
 
                 container.innerHTML = `
                     <div class="page">
@@ -242,7 +243,7 @@
                     <div class="page">
                         <div class="exercise-focus">
                             <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 2.2rem;">${ex.titulo}</h2>
-                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Archivo+no+encontrado:+${ex.img}'">
+                            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Error:+${ex.img}'">
                             <p style="margin:15px 0; font-style:italic; color:#555;">${ex.desc}</p>
                             <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:4rem; cursor:pointer;">
                                 ${isDone ? '✅' : '⭐'}
@@ -288,18 +289,18 @@
         }
 
         function toggleStar(id) {
-            if(completedSet.has(id)) completedSet.delete(id);
-            else {
+            if(completedSet.has(id)) {
+                completedSet.delete(id);
+            } else {
                 completedSet.add(id);
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
             }
-            // Guardar en localStorage
             localStorage.setItem('balletProgress', JSON.stringify(Array.from(completedSet)));
             renderBook();
         }
 
         function resetProgress() {
-            if(confirm("¿Quieres borrar todas tus estrellas y empezar de nuevo?")) {
+            if(confirm("¿Quieres borrar todas tus estrellas?")) {
                 completedSet.clear();
                 localStorage.removeItem('balletProgress');
                 renderBook();
