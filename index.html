@@ -127,7 +127,7 @@
         <div class="book-container">
             <div class="book-content">
                 <div class="page">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Ejercicios</h2>
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Diario de Ejercicios</h2>
                     <div class="progress-box">
                         <strong id="ui-percent">0%</strong> completado | <span id="ui-stars">0/0</span> ⭐
                     </div>
@@ -156,7 +156,6 @@
             try {
                 const res = await fetch(URL_EJERCICIOS);
                 const csvData = await res.text();
-                // Separar filas y limpiar espacios/comillas
                 const rows = csvData.split('\n').slice(1); 
                 
                 allExercises = rows.filter(row => row.trim() !== "").map((row, i) => {
@@ -166,7 +165,7 @@
                         cat: cols[1] || 'Varios',
                         titulo: cols[2] || 'Ejercicio',
                         desc: cols[3] || '',
-                        img: cols[4] || '' // Aquí llega el nombre del archivo del Sheet
+                        img: cols[4] || '' // Nombre del archivo del Sheet
                     };
                 });
 
@@ -186,7 +185,7 @@
 
             const isDone = completedSet.has(ex.id);
             
-            // OPCIÓN A: Se añade el prefijo 'img/' automáticamente al nombre del archivo
+            // LA LÓGICA CLAVE: Se añade el prefijo 'img/' automáticamente
             const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
 
             container.innerHTML = `
