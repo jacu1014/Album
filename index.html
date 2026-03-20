@@ -124,10 +124,45 @@
         .btn-reset:hover { background: var(--dorado); color: white; }
 
         @media (max-width: 800px) {
-            .book-content { flex-direction: column; height: auto; }
-            .page { min-height: 400px; }
-            .side-tabs { display: none; }
-        }
+    body { padding: 5px; }
+    
+    .main-wrapper { 
+        flex-direction: column; /* Pone los botones arriba o abajo */
+        height: 100vh;
+    }
+
+    .side-tabs {
+        flex-direction: row; /* Botones horizontales en móvil */
+        margin-right: 0;
+        margin-bottom: -5px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tab-btn {
+        border-radius: 12px 12px 0 0; /* Pestañas hacia arriba */
+        padding: 10px 20px;
+        transform: none;
+    }
+    
+    .tab-btn.active { transform: translateY(5px); }
+
+    .book-content {
+        flex-direction: column;
+        height: 80vh;
+        background-image: none; /* Quitamos el lomo del libro en móvil */
+        background-color: var(--blanco-papel);
+    }
+
+    /* En móvil, si estamos viendo un ejercicio, ocultamos la página del índice */
+    .page-hidden-mobile {
+        display: none !important;
+    }
+    
+    .page {
+        padding: 20px;
+    }
+}
     </style>
 </head>
 <body>
