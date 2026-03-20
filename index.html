@@ -175,22 +175,13 @@
             // 1. Cargar Configuración
             const resConfig = await fetch(URL_CONFIG);
             const csvConfig = await resConfig.text();
-            const configLines = csvConfig.split(/\r?\n/); // Divide por líneas de forma segura
-
-            // Buscamos la fila que contiene la clave exacta
-            const filaMensaje = configLines.find(line => {
-                const limpia = line.replace(/"/g, '').trim(); // Quitamos comillas y espacios
-                return limpia.startsWith("MensajeDelDia");
-            });
-
+            const configLines = csvConfig.split('\n');
+            const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
             if (filaMensaje) {
-                // Usamos la función splitCSV que ya tienes para separar Clave y Valor
-                const configCols = splitCSV(filaMensaje); 
-                // configCols[0] es "MensajeDelDia", configCols[1] es el mensaje real
-                fraseDia = configCols[1] || "¡Hoy vas a brillar como una estrella! ✨";
-            } else {
-                fraseDia = "¡A bailar!"; // Valor por defecto si no lo encuentra
+                const configCols = splitCSV(filaMensaje);
+                fraseDia = configCols[1] || "¡A bailar!";
             }
+
             // 2. Cargar Ejercicios
             const resEx = await fetch(URL_EJERCICIOS);
             const csvEx = await resEx.text();
