@@ -69,7 +69,7 @@
         .content-area {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             padding-right: 10px;
         }
 
@@ -80,7 +80,6 @@
         }
 
         .arrow {
-            position: absolute; bottom: 20px;
             background: #4a90e2; color: white; border: none;
             width: 45px; height: 45px; border-radius: 50%;
             cursor: pointer; font-size: 1.2rem; display: flex;
@@ -88,8 +87,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             z-index: 20;
         }
-        .arrow-prev { left: 20px; }
-        .arrow-next { right: 20px; }
 
         .img-large {
             width: 100%; max-height: 250px; object-fit: contain;
@@ -98,36 +95,31 @@
             background: #fdfdfd;
         }
 
-        /* AJUSTES PARA MÓVIL (EVITA AMONTONAMIENTO) */
+        .only-mobile { display: none; }
+
         @media (max-width: 800px) {
+            .only-mobile { display: block; }
             body { align-items: flex-start; padding: 5px; }
-            
             .main-wrapper { flex-direction: column; }
-            
             .side-tabs { 
                 flex-direction: row; margin-right: 0; margin-bottom: -10px; 
                 width: 100%; justify-content: center; 
             }
-            
             .tab-btn { border-radius: 12px 12px 0 0; padding: 12px 20px; }
             .tab-btn.active { transform: translateY(5px); }
 
             .book-content { 
                 flex-direction: column; 
-                height: auto; /* Permite que el contenido crezca */
-                min-height: 90vh;
-                background-image: none; /* Simplifica fondo en móvil */
+                height: auto; 
+                min-height: 80vh;
+                background-image: none;
             }
 
-            .page { padding: 20px; height: auto; flex: none; }
-            
-            /* Ocultar página izquierda en móvil cuando se ve un ejercicio */
-            .page-left-mobile { display: none; }
+            .page { padding: 20px; flex: none; width: 100%; box-sizing: border-box; }
+            .mobile-hide { display: none !important; } /* Esta es la clave */
             
             .img-large { max-height: 200px; }
-            
-            .arrow { position: static; margin: 10px auto; }
-            .nav-mobile { display: flex; justify-content: space-between; margin-top: 15px; }
+            .nav-mobile { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         }
     </style>
 </head>
@@ -204,6 +196,7 @@
         const total = allExercises.length;
         const done = completedSet.size;
         const porcentaje = total > 0 ? Math.round((done/total)*100) : 0;
+        const isMobile = window.innerWidth <= 800;
 
         if (currentIndex === -1) {
             container.innerHTML = `
@@ -213,7 +206,7 @@
                         <div style="background: var(--verde-menta); padding: 15px; border-radius: 15px; border: 2px dashed var(--rosa-principal); margin: 20px 0;">
                             <p style="font-style:italic; color: var(--texto);">"${fraseDia}"</p>
                         </div>
-                        <button class="btn-reset" onclick="resetProgress()" style="padding:10px 15px; border-radius:20px; border:1px solid var(--dorado); background:var(--rosa-principal); cursor:pointer;">🔄 Reiniciar</button>
+                        <button onclick="resetProgress()" style="padding:10px 15px; border-radius:20px; border:1px solid var(--dorado); background:var(--rosa-principal); cursor:pointer;">🔄 Reiniciar</button>
                     </div>
                 </div>
                 <div class="page">
@@ -225,29 +218,33 @@
         } else {
             const ex = filteredExercises[currentIndex];
             const isDone = completedSet.has(ex.id);
-            // CORRECCIÓN DE IMAGEN: Si el nombre tiene espacios, los codifica
             const cleanImgName = ex.img ? encodeURIComponent(ex.img.trim()) : '';
             const imagePath = cleanImgName ? `img/${cleanImgName}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
 
             container.innerHTML = `
-                <div class="page page-left-mobile">
+                <div class="page ${isMobile ? 'mobile-hide' : ''}">
                     <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Clases</h2>
                     <div class="content-area">${generateIndexHTML()}</div>
-                    <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
                 </div>
+
                 <div class="page">
                     <div style="text-align:center;">
-                        <button onclick="currentIndex = -1; renderBook();" style="display:block; margin:0 auto 10px; background:var(--verde-menta); border:1px solid var(--rosa-principal); padding:5px 10px; border-radius:10px;" class="only-mobile">🏠 Menú principal</button>
+                        <button onclick="currentIndex = -1; renderBook();" class="only-mobile" 
+                                style="width:100%; background:var(--rosa-principal); border:1px solid var(--dorado); padding:10px; border-radius:10px; margin-bottom:15px; font-weight:bold; cursor:pointer;">
+                            🏠 Volver al Índice
+                        </button>
+
                         <h2 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 1.8rem; margin:10px 0;">${ex.titulo}</h2>
                         <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Cargando+imagen...'">
-                        <p style="margin:15px 0; color:var(--texto); font-size: 1rem;">${ex.desc}</p>
-                        <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer;">
-                            ${isDone ? '✅' : '⭐'}
-                        </button>
-                    </div>
-                    <div class="nav-mobile">
-                        <button class="arrow arrow-prev only-mobile" onclick="prevPage()">⬅</button>
-                        <button class="arrow arrow-next" onclick="nextPage()">➡</button>
+                        <p style="margin:15px 0; color:var(--texto); font-size: 1rem; line-height:1.4;">${ex.desc}</p>
+                        
+                        <div style="display:flex; justify-content:center; align-items:center; gap:20px;">
+                            <button class="arrow" onclick="prevPage()">⬅</button>
+                            <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer;">
+                                ${isDone ? '✅' : '⭐'}
+                            </button>
+                            <button class="arrow" onclick="nextPage()">➡</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -299,6 +296,9 @@
 
     function nextPage() { if (currentIndex < filteredExercises.length - 1) { currentIndex++; renderBook(); } }
     function prevPage() { if (currentIndex > 0) { currentIndex--; renderBook(); } }
+
+    // Escuchar cambios de tamaño para ajustar la vista
+    window.addEventListener('resize', renderBook);
 
     init();
 </script>
