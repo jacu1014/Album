@@ -32,7 +32,7 @@
 
         .side-tabs {
             display: flex; flex-direction: column; gap: 8px;
-            z-index: 1; margin-right: -5px;
+            z-index: 10; margin-right: -5px;
         }
 
         .tab-btn {
@@ -49,6 +49,7 @@
             padding: 12px; border-radius: 15px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.6);
             position: relative; z-index: 2;
+            width: 100%;
         }
 
         .book-content {
@@ -72,19 +73,16 @@
             padding-right: 10px;
         }
 
-        .content-area::-webkit-scrollbar { width: 5px; }
-        .content-area::-webkit-scrollbar-thumb { background: var(--rosa-principal); border-radius: 10px; }
-
         .index-item {
-            padding: 10px 0; border-bottom: 1px dashed #eee;
+            padding: 12px 8px; border-bottom: 1px dashed #eee;
             cursor: pointer; display: flex; justify-content: space-between;
-            font-size: 0.95rem;
+            font-size: 0.95rem; border-radius: 5px;
         }
 
         .arrow {
             position: absolute; bottom: 20px;
             background: #4a90e2; color: white; border: none;
-            width: 40px; height: 40px; border-radius: 8px;
+            width: 45px; height: 45px; border-radius: 50%;
             cursor: pointer; font-size: 1.2rem; display: flex;
             align-items: center; justify-content: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -93,91 +91,58 @@
         .arrow-prev { left: 20px; }
         .arrow-next { right: 20px; }
 
-        .exercise-focus { text-align: center; }
-        
         .img-large {
-            width: 100%; max-height: 280px; object-fit: contain;
-            border: 5px solid white; border-radius: 5px;
+            width: 100%; max-height: 250px; object-fit: contain;
+            border: 4px solid white; border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            background: #f9f9f9;
+            background: #fdfdfd;
         }
 
-        .welcome-screen {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .btn-reset {
-            background: var(--rosa-principal);
-            border: 2px solid var(--dorado);
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Quicksand';
-            font-weight: bold;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-        .btn-reset:hover { background: var(--dorado); color: white; }
-
+        /* AJUSTES PARA MÓVIL (EVITA AMONTONAMIENTO) */
         @media (max-width: 800px) {
-    body { padding: 5px; }
-    
-    .main-wrapper { 
-        flex-direction: column; /* Pone los botones arriba o abajo */
-        height: 100vh;
-    }
+            body { align-items: flex-start; padding: 5px; }
+            
+            .main-wrapper { flex-direction: column; }
+            
+            .side-tabs { 
+                flex-direction: row; margin-right: 0; margin-bottom: -10px; 
+                width: 100%; justify-content: center; 
+            }
+            
+            .tab-btn { border-radius: 12px 12px 0 0; padding: 12px 20px; }
+            .tab-btn.active { transform: translateY(5px); }
 
-    .side-tabs {
-        flex-direction: row; /* Botones horizontales en móvil */
-        margin-right: 0;
-        margin-bottom: -5px;
-        width: 100%;
-        justify-content: center;
-    }
+            .book-content { 
+                flex-direction: column; 
+                height: auto; /* Permite que el contenido crezca */
+                min-height: 90vh;
+                background-image: none; /* Simplifica fondo en móvil */
+            }
 
-    .tab-btn {
-        border-radius: 12px 12px 0 0; /* Pestañas hacia arriba */
-        padding: 10px 20px;
-        transform: none;
-    }
-    
-    .tab-btn.active { transform: translateY(5px); }
-
-    .book-content {
-        flex-direction: column;
-        height: 80vh;
-        background-image: none; /* Quitamos el lomo del libro en móvil */
-        background-color: var(--blanco-papel);
-    }
-
-    /* En móvil, si estamos viendo un ejercicio, ocultamos la página del índice */
-    .page-hidden-mobile {
-        display: none !important;
-    }
-    
-    .page {
-        padding: 20px;
-    }
-}
+            .page { padding: 20px; height: auto; flex: none; }
+            
+            /* Ocultar página izquierda en móvil cuando se ve un ejercicio */
+            .page-left-mobile { display: none; }
+            
+            .img-large { max-height: 200px; }
+            
+            .arrow { position: static; margin: 10px auto; }
+            .nav-mobile { display: flex; justify-content: space-between; margin-top: 15px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper">
         <div class="side-tabs">
-            <button class="tab-btn active" id="btn-home" onclick="goHome(this)">🏠</button>
+            <button class="tab-btn active" onclick="goHome(this)">🏠</button>
             <button class="tab-btn" onclick="changeCategory('Pies', this)">🩰</button>
             <button class="tab-btn" onclick="changeCategory('Brazos', this)">👐</button>
             <button class="tab-btn" onclick="changeCategory('Movimiento', this)">✨</button>
         </div>
 
         <div class="book-container">
-            <div class="book-content" id="book-inner">
-                </div>
+            <div class="book-content" id="book-inner"></div>
         </div>
     </div>
 
@@ -199,7 +164,6 @@
         completedSet = new Set(JSON.parse(localStorage.getItem('balletProgress')));
     }
 
-    // Función mágica para separar por comas ignorando las que están entre comillas
     function splitCSV(row) {
         const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
         return row.split(regex).map(c => c.replace(/^"|"$/g, '').trim());
@@ -207,17 +171,12 @@
 
     async function init() {
         try {
-            // 1. Cargar Configuración
             const resConfig = await fetch(URL_CONFIG);
             const csvConfig = await resConfig.text();
-            const configLines = csvConfig.split('\n');
+            const configLines = csvConfig.split(/\r?\n/);
             const filaMensaje = configLines.find(line => line.includes("MensajeDelDia"));
-            if (filaMensaje) {
-                const configCols = splitCSV(filaMensaje);
-                fraseDia = configCols[1] || "¡A bailar!";
-            }
+            if (filaMensaje) fraseDia = splitCSV(filaMensaje)[1];
 
-            // 2. Cargar Ejercicios
             const resEx = await fetch(URL_EJERCICIOS);
             const csvEx = await resEx.text();
             const rows = csvEx.split(/\r?\n/).slice(1); 
@@ -229,7 +188,6 @@
                     cat: cols[1] || 'Varios',
                     titulo: cols[2] || 'Ejercicio',
                     desc: cols[3] || '',
-                    // Columna 5 es "Imagen (Referencia)" según tu tabla
                     img: cols[5] || '' 
                 };
             });
@@ -238,11 +196,6 @@
             renderBook();
         } catch (e) {
             console.error("Error cargando datos:", e);
-            document.getElementById('book-inner').innerHTML = `
-                <div class="page" style="text-align:center; justify-content:center;">
-                    <h2 style="color:var(--dorado)">⚠️ No se pudo conectar con el libro.</h2>
-                    <p>Verifica que el archivo esté publicado en la Web como CSV.</p>
-                </div>`;
         }
     }
 
@@ -255,42 +208,47 @@
         if (currentIndex === -1) {
             container.innerHTML = `
                 <div class="page">
-                    <div class="welcome-screen">
-                        <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 3rem;">Mi Diario de Ballet</h1>
-                        <div style="background: var(--verde-menta); padding: 20px; border-radius: 15px; border: 2px dashed var(--rosa-principal);">
-                            <p style="font-style:italic; font-size:1.3rem; color: var(--texto); margin:0;">"${fraseDia}"</p>
+                    <div style="text-align:center; margin-top:20px;">
+                        <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 2.5rem;">Mi Diario de Ballet</h1>
+                        <div style="background: var(--verde-menta); padding: 15px; border-radius: 15px; border: 2px dashed var(--rosa-principal); margin: 20px 0;">
+                            <p style="font-style:italic; color: var(--texto);">"${fraseDia}"</p>
                         </div>
-                        <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar progreso</button>
+                        <button class="btn-reset" onclick="resetProgress()" style="padding:10px 15px; border-radius:20px; border:1px solid var(--dorado); background:var(--rosa-principal); cursor:pointer;">🔄 Reiniciar</button>
                     </div>
                 </div>
                 <div class="page">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Ejercicios</h2>
-                    <p>Progreso total: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
+                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice</h2>
+                    <p style="font-size:0.9rem;">Progreso: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
                     <div class="content-area">${generateIndexHTML()}</div>
                 </div>
             `;
         } else {
             const ex = filteredExercises[currentIndex];
             const isDone = completedSet.has(ex.id);
-            // Se asegura de que la ruta sea img/nombre_archivo.png
-            const imagePath = ex.img ? `img/${ex.img}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+            // CORRECCIÓN DE IMAGEN: Si el nombre tiene espacios, los codifica
+            const cleanImgName = ex.img ? encodeURIComponent(ex.img.trim()) : '';
+            const imagePath = cleanImgName ? `img/${cleanImgName}` : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
 
             container.innerHTML = `
-                <div class="page">
+                <div class="page page-left-mobile">
                     <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Clases</h2>
                     <div class="content-area">${generateIndexHTML()}</div>
                     <button class="arrow arrow-prev" onclick="prevPage()">⬅</button>
                 </div>
                 <div class="page">
-                    <div class="exercise-focus">
-                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 2.2rem;">${ex.titulo}</h2>
-                        <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=No+encontrada:+${ex.img}'">
-                        <p style="margin:15px 0; font-size: 1.1rem; color:#4E342E;">${ex.desc}</p>
-                        <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:4rem; cursor:pointer; transition: 0.3s transform;">
+                    <div style="text-align:center;">
+                        <button onclick="currentIndex = -1; renderBook();" style="display:block; margin:0 auto 10px; background:var(--verde-menta); border:1px solid var(--rosa-principal); padding:5px 10px; border-radius:10px;" class="only-mobile">🏠 Menú principal</button>
+                        <h2 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 1.8rem; margin:10px 0;">${ex.titulo}</h2>
+                        <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=Cargando+imagen...'">
+                        <p style="margin:15px 0; color:var(--texto); font-size: 1rem;">${ex.desc}</p>
+                        <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3.5rem; cursor:pointer;">
                             ${isDone ? '✅' : '⭐'}
                         </button>
                     </div>
-                    <button class="arrow arrow-next" onclick="nextPage()">➡</button>
+                    <div class="nav-mobile">
+                        <button class="arrow arrow-prev only-mobile" onclick="prevPage()">⬅</button>
+                        <button class="arrow arrow-next" onclick="nextPage()">➡</button>
+                    </div>
                 </div>
             `;
         }
@@ -298,7 +256,7 @@
 
     function generateIndexHTML() {
         return filteredExercises.map((ex, i) => `
-            <div class="index-item" style="font-weight: ${currentIndex === i ? 'bold' : 'normal'}; background: ${currentIndex === i ? '#fff5f6' : 'transparent'}" onclick="selectExercise(${i})">
+            <div class="index-item" style="background: ${currentIndex === i ? '#fff5f6' : 'transparent'}; border:${currentIndex === i ? '1px solid var(--rosa-principal)' : 'none'}" onclick="selectExercise(${i})">
                 <span>${i+1}. ${ex.titulo}</span>
                 <span>${completedSet.has(ex.id) ? '✅' : '⚪'}</span>
             </div>
