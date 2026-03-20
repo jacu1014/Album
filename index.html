@@ -123,44 +123,69 @@
         }
         .btn-reset:hover { background: var(--dorado); color: white; }
 
-        @media (max-width: 800px) {
-    body { padding: 5px; }
+        /* Ajustes para evitar el amontonamiento en móviles */
+@media (max-width: 800px) {
+    body { 
+        padding: 5px; 
+        align-items: flex-start; /* Permite que el contenido crezca hacia abajo */
+        overflow-y: auto; 
+    }
     
     .main-wrapper { 
-        flex-direction: column; /* Pone los botones arriba o abajo */
-        height: 100vh;
+        flex-direction: column;
+        height: auto; /* Altura automática para que no se encime */
+        min-height: 100vh;
     }
 
     .side-tabs {
-        flex-direction: row; /* Botones horizontales en móvil */
-        margin-right: 0;
-        margin-bottom: -5px;
+        flex-direction: row;
+        margin-bottom: -2px;
         width: 100%;
         justify-content: center;
+        position: sticky; /* Los botones se quedan arriba al bajar */
+        top: 0;
+        background: #1a2a2a;
+        padding: 10px 0;
     }
 
     .tab-btn {
-        border-radius: 12px 12px 0 0; /* Pestañas hacia arriba */
-        padding: 10px 20px;
-        transform: none;
+        border-radius: 10px 10px 0 0;
+        padding: 12px;
+        font-size: 1.2rem;
     }
-    
-    .tab-btn.active { transform: translateY(5px); }
+
+    .book-container {
+        padding: 8px;
+        height: auto; /* Importante: deja que el contenido defina el alto */
+    }
 
     .book-content {
         flex-direction: column;
-        height: 80vh;
-        background-image: none; /* Quitamos el lomo del libro en móvil */
-        background-color: var(--blanco-papel);
+        height: auto; /* Eliminamos el 85vh que causa el amontonamiento */
+        min-height: 500px;
+        background-image: none; /* Quitamos sombras de "libro" en móvil */
     }
 
-    /* En móvil, si estamos viendo un ejercicio, ocultamos la página del índice */
+    .page {
+        padding: 15px;
+        height: auto; /* Altura fluida */
+        display: block; /* Cambiamos de flex a block para mejor flujo */
+    }
+
+    .welcome-screen h1 { font-size: 2.2rem !important; }
+    
     .page-hidden-mobile {
         display: none !important;
     }
-    
-    .page {
-        padding: 20px;
+
+    /* Ajuste para que las flechas no tapen texto */
+    .arrow {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 20px auto;
+        display: inline-flex;
     }
 }
     </style>
@@ -253,22 +278,34 @@
         const porcentaje = total > 0 ? Math.round((done/total)*100) : 0;
 
         if (currentIndex === -1) {
-            container.innerHTML = `
-                <div class="page">
-                    <div class="welcome-screen">
-                        <h1 style="font-family:'Dancing Script'; color:var(--dorado); font-size: 3rem;">Mi Diario de Ballet</h1>
-                        <div style="background: var(--verde-menta); padding: 20px; border-radius: 15px; border: 2px dashed var(--rosa-principal);">
-                            <p style="font-style:italic; font-size:1.3rem; color: var(--texto); margin:0;">"${fraseDia}"</p>
-                        </div>
-                        <button class="btn-reset" onclick="resetProgress()">🔄 Reiniciar progreso</button>
-                    </div>
-                </div>
-                <div class="page">
-                    <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Índice de Ejercicios</h2>
-                    <p>Progreso total: <strong>${porcentaje}%</strong> (${done}/${total} ⭐)</p>
-                    <div class="content-area">${generateIndexHTML()}</div>
-                </div>
-            `;
+            // Dentro de tu función renderBook, en la parte del ejercicio (else):
+container.innerHTML = `
+    <div class="page page-hidden-mobile">
+        <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0;">Clases</h2>
+        <div class="content-area">${generateIndexHTML()}</div>
+    </div>
+    <div class="page">
+        <div class="exercise-focus">
+            <button onclick="currentIndex = -1; renderBook();" 
+                    style="background:var(--verde-menta); border:1px solid var(--rosa-principal); border-radius:10px; padding:5px 15px; margin-bottom:15px; cursor:pointer;" 
+                    class="only-mobile">
+                ⬅ Volver al índice
+            </button>
+            
+            <h2 style="font-family:'Dancing Script'; color:var(--dorado); margin-top:0; font-size: 1.8rem;">${ex.titulo}</h2>
+            <img src="${imagePath}" class="img-large" onerror="this.src='https://via.placeholder.com/400x300?text=No+encontrada'">
+            <p style="margin:15px 0; font-size: 1rem; color:#4E342E;">${ex.desc}</p>
+            
+            <div style="display:flex; justify-content:center; align-items:center; gap:20px;">
+                <button class="arrow" onclick="prevPage()">⬅</button>
+                <button onclick="toggleStar(${ex.id})" style="background:none; border:none; font-size:3rem; cursor:pointer;">
+                    ${isDone ? '✅' : '⭐'}
+                </button>
+                <button class="arrow" onclick="nextPage()">➡</button>
+            </div>
+        </div>
+    </div>
+`;
         } else {
             const ex = filteredExercises[currentIndex];
             const isDone = completedSet.has(ex.id);
